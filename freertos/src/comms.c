@@ -1,0 +1,111 @@
+#include "FreeRTOS.h"
+#include "queue.h"
+#include "task.h"
+
+#include "FreeRTOS_IP.h"
+#include "FreeRTOS_Sockets.h"
+
+#include "app_config.h"
+#include "logging.h"
+#include "wire_protocol.h"
+#include "comms.h"
+
+typedef struct
+{
+    int32_t wheel_speed;
+} comms_msg_s;
+
+static void comms_task(void* params);
+
+static const char TID[] = COMMS_TASKS_TIMELINE_ID;
+
+#define COMMS_QUEUE_LENGTH (8)
+static QueueHandle_t g_comms_queue = NULL;
+
+void comms_init(void)
+{
+    g_comms_queue = xQueueCreate(COMMS_QUEUE_LENGTH, sizeof(comms_msg_s));
+    configASSERT(g_comms_queue != NULL);
+
+    xTaskCreate(comms_task, COMMS_NAME, COMMS_STACK_SIZE, NULL, COMMS_PRIO, NULL);
+
+    traceString ch = xTraceRegisterString("modality-timeline-id");
+    xTracePrintF(ch, "name=%s,id=%s", xTraceRegisterString(COMMS_NAME), xTraceRegisterString(TID));
+
+    printf(COMMS_NAME " timeline-id: " COMMS_TASKS_TIMELINE_ID "\n");
+}
+
+void comms_send_sensor_data(int32_t wheel_speed)
+{
+    comms_msg_s msg =
+    {
+        .wheel_speed = wheel_speed,
+    };
+
+    const BaseType_t was_posted = xQueueSend(g_comms_queue, &msg, 0);
+    if(was_posted != pdTRUE)
+    {
+        ERR("Failed to send sensor data");
+    }
+}
+
+static comms_msg_s comms_recv(void)
+{
+    comms_msg_s msg;
+    const BaseType_t was_recvd = xQueueReceive(g_comms_queue, &msg, portMAX_DELAY);
+    configASSERT(was_recvd == pdTRUE);
+    return msg;
+}
+
+static void comms_task(void* params)
+{
+    BaseType_t status;
+    traceString ch;
+    wire_msg_s wire_msg = {0};
+    Socket_t socket = FREERTOS_INVALID_SOCKET;
+    struct freertos_sockaddr addr = {0};
+    (void) params;
+
+    (void) memcpy(&wire_msg.tid[0], &TID[0], WIRE_TID_LEN);
+
+    ch = xTraceRegisterString("comms-tx");
+
+    while(FreeRTOS_IsNetworkUp() == pdFALSE)
+    {
+        vTaskDelay(pdMS_TO_TICKS(10));
+    }
+
+    addr.sin_port = FreeRTOS_htons(SENSOR_DATA_PORT);
+    addr.sin_addr = FreeRTOS_inet_addr_quick(
+            configIP_ADDR0,
+            configIP_ADDR1,
+            configIP_ADDR2,
+            255);
+
+    socket = FreeRTOS_socket(
+            FREERTOS_AF_INET,
+            FREERTOS_SOCK_DGRAM,
+            FREERTOS_IPPROTO_UDP);
+    configASSERT(socket != FREERTOS_INVALID_SOCKET);
+
+    INFO("Comms network ready");
+
+    while(1)
+    {
+        const comms_msg_s comms_msg = comms_recv();
+
+        wire_msg.magic0 = WIRE_MAGIC0;
+        wire_msg.magic1 = WIRE_MAGIC1;
+        wire_msg.type = WIRE_TYPE_WHEEL_SPEED;
+        wire_msg.seqnum += 1;
+        wire_msg.wheel_speed = comms_msg.wheel_speed;
+
+        xTracePrintF(ch, "%u %u %d %u", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed, wire_msg.seqnum);
+
+        status = FreeRTOS_sendto(socket, &wire_msg, sizeof(wire_msg), 0, &addr, sizeof(addr));
+        if(status < 0)
+        {
+            ERR("Failed to send sensor data wire message");
+        }
+    }
+}

@@ -1,0 +1,30 @@
+@startuml
+
+skinparam defaultTextAlignment center
+skinparam linetype poly
+
+agent "modality-reflector" as reflector
+
+node "Gazebo Docker Container" as gz_container {
+    agent "Gazebo World" as gz_world
+}
+
+node "Renode Docker Container" as renode_container {
+    node "Renode Emulator" as renode {
+        agent "FreeRTOS Application (stm32f4)" as freertos_app
+    }
+}
+
+node "Linux Docker Container" as linux_container {
+    agent "Linux Application" as linux_app
+}
+
+gz_world -[dotted]-> freertos_app : Simulator Sensor Data
+freertos_app -> linux_app : Application Communications
+linux_app -[dotted]> gz_world : Simulator Control Data
+
+linux_app ..> reflector : LTTng-UST CTF
+freertos_app ..> reflector : TraceRecorder
+gz_world ..> reflector : Modality SDK
+
+@enduml

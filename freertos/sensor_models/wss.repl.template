@@ -1,0 +1,4 @@
+wss: Python.PythonPeripheral @ sysbus 0x50070000
+    size: 0x10
+    initable: true
+    filename: "$ORIGIN/sensor_models/wss.py"

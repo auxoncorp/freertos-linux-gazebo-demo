@@ -1,0 +1,46 @@
+:name: emulate
+:description: This script runs the embedded firmware on an STM32F4 Discovery board.
+
+$name?="STM32F4_Discovery"
+$bin?=@build/sensor-firmware
+$tap?="renode-tap0"
+
+using sysbus
+mach create $name
+machine LoadPlatformDescription @platforms/boards/stm32f4_discovery-kit.repl
+machine LoadPlatformDescriptionFromString
+"""
+// Just to make the FreeRTOS network interface PHY discovery less noisy
+phy2: Network.EthernetPhysicalLayer @ ethernet 2
+    Id1: 0x0000
+    Id2: 0x0000
+
+phy3: Network.EthernetPhysicalLayer @ ethernet 3
+    Id1: 0x0000
+    Id2: 0x0000
+"""
+machine LoadPlatformDescription @sensor_models/wss.repl
+
+# Disable PHY1 from being probed
+ethernet.phy1 Id1 0
+ethernet.phy1 Id2 0
+
+# Silence warnings
+logLevel 3
+logLevel -1 wss
+
+# See https://github.com/renode/renode/issues/290 for more info
+# Make to sure to run the ./renode/setup-network.sh script first
+emulation CreateSwitch "switch"
+connector Connect sysbus.ethernet switch
+emulation CreateTap $tap "tap"
+connector Connect host.tap switch
+
+# Virtual time ~= real time, default is 120
+cpu PerformanceInMips 1
+
+showAnalyzer sysbus.usart3
+
+sysbus LoadELF $bin
+
+start

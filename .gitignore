@@ -1,0 +1,10 @@
+/freertos/sensor_models/wss.repl
+/freertos/build
+/freertos/.gdb_history
+/freertos/tags
+
+/linux/.vagrant
+/linux/build
+/linux/actuator/build
+
+/gazebo/imu_relay/build
