@@ -186,7 +186,7 @@ extern "C" {
  *
  * Default value is 1.
  */
-#define TRC_CFG_STACK_MONITOR_MAX_REPORTS 1
+#define TRC_CFG_STACK_MONITOR_MAX_REPORTS 2
 
 /**
  * @def TRC_CFG_CTRL_TASK_PRIORITY

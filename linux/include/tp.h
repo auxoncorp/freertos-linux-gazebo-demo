@@ -74,6 +74,17 @@ TRACEPOINT_EVENT(
 
 TRACEPOINT_EVENT(
     actuator,
+    target_velocity,
+    TP_ARGS(
+        double, target_velocity
+    ),
+    TP_FIELDS(
+        ctf_float(double, target_velocity, target_velocity)
+    )
+)
+
+TRACEPOINT_EVENT(
+    actuator,
     set_pwm,
     TP_ARGS(
         uint16_t, duty

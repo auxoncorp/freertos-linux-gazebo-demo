@@ -45,7 +45,7 @@ static void wss_task(void* params)
     TickType_t next_wake;
     (void) params;
 
-    ch = xTraceRegisterString("wheel-speed");
+    ch = xTraceRegisterString("wheel_speed");
     next_wake = xTaskGetTickCount();
     while(1)
     {

@@ -200,6 +200,7 @@ add_executable(
     ${PROJECT_NAME}
     src/main.c
     src/logging.c
+    src/stats.c
     src/ip.c
     src/comms.c
     src/wss.c

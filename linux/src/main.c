@@ -126,13 +126,16 @@ int main(int argc, char** argv)
                 {
                     /* Handle valid message */
                     duty = clamped_duty(duty + 10);
+                    double target_velocity = ((double) duty / 1000.0) * 1.0;
+                    tracepoint(actuator, target_velocity, target_velocity);
                     tracepoint(actuator, set_pwm, duty);
-                    actuator_set_vel(actuator, ((double) duty / 1000.0) * 1.0);
+                    actuator_set_vel(actuator, target_velocity);
                 }
             }
         }
     }
 
+    tracepoint(actuator, target_velocity, 0.0);
     actuator_set_vel(actuator, 0.0);
 
     close(msg_socket);

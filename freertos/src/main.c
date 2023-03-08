@@ -6,6 +6,7 @@
 #include "ip.h"
 #include "comms.h"
 #include "wss.h"
+#include "stats.h"
 
 #include "stm32f4xx_hal_conf.h"
 
@@ -27,6 +28,7 @@ int main(void)
     ip_init();
     comms_init();
     wss_init();
+    stats_init();
 
     configASSERT(xTraceDiagnosticsCheckStatus() == TRC_SUCCESS);
     const char* err = NULL;

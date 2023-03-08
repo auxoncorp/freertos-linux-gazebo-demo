@@ -53,8 +53,10 @@ void vAssertCalled(const char* file, int line);
 #define configCHECK_FOR_STACK_OVERFLOW                   2
 #define configUSE_TRACE_FACILITY                         1
 
-#define configGENERATE_RUN_TIME_STATS                    0
-#define configRECORD_STACK_HIGH_ADDRESS                  0
+#define configGENERATE_RUN_TIME_STATS                    1
+#define configRECORD_STACK_HIGH_ADDRESS                  1
+#define portCONFIGURE_TIMER_FOR_RUN_TIME_STATS()
+#define portGET_RUN_TIME_COUNTER_VALUE() (timer_read())
 
 #define configMAX_PRIORITIES                             ( 5 )
 #define configMAX_CO_ROUTINE_PRIORITIES                  ( 2 )

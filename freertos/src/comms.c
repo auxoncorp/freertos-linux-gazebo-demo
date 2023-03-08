@@ -29,7 +29,7 @@ void comms_init(void)
 
     xTaskCreate(comms_task, COMMS_NAME, COMMS_STACK_SIZE, NULL, COMMS_PRIO, NULL);
 
-    traceString ch = xTraceRegisterString("modality-timeline-id");
+    traceString ch = xTraceRegisterString("modality_timeline_id");
     xTracePrintF(ch, "name=%s,id=%s", xTraceRegisterString(COMMS_NAME), xTraceRegisterString(TID));
 
     printf(COMMS_NAME " timeline-id: " COMMS_TASKS_TIMELINE_ID "\n");
@@ -64,11 +64,12 @@ static void comms_task(void* params)
     wire_msg_s wire_msg = {0};
     Socket_t socket = FREERTOS_INVALID_SOCKET;
     struct freertos_sockaddr addr = {0};
+    uint8_t mutator_state = 0;
     (void) params;
 
     (void) memcpy(&wire_msg.tid[0], &TID[0], WIRE_TID_LEN);
 
-    ch = xTraceRegisterString("comms-tx");
+    ch = xTraceRegisterString("comms_tx");
 
     while(FreeRTOS_IsNetworkUp() == pdFALSE)
     {
@@ -99,6 +100,28 @@ static void comms_task(void* params)
         wire_msg.type = WIRE_TYPE_WHEEL_SPEED;
         wire_msg.seqnum += 1;
         wire_msg.wheel_speed = comms_msg.wheel_speed;
+
+        if((wire_msg.seqnum > 10) && ((wire_msg.seqnum) % 5 == 0))
+        {
+            if(mutator_state == 0)
+            {
+                wire_msg.magic0 = ~wire_msg.magic0;
+            }
+            else if(mutator_state == 1)
+            {
+                wire_msg.magic1 = ~wire_msg.magic1;
+            }
+            else if(mutator_state == 2)
+            {
+                wire_msg.type += 1;
+            }
+
+            mutator_state += 1;
+            if(mutator_state == 3)
+            {
+                mutator_state = 0;
+            }
+        }
 
         xTracePrintF(ch, "%u %u %d %u", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed, wire_msg.seqnum);
 

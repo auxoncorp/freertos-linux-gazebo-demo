@@ -103,7 +103,7 @@
               filename='ModalityTracingPlugin'>
               <enabled>true</enabled>
               <!-- <auth_token>YOUR_AUTH_TOKEN_HEX_HERE</auth_token> -->
-              <timeline_name>robot-chassis</timeline_name>
+              <timeline_name>robot_chassis</timeline_name>
               <allow_insecure_tls>true</allow_insecure_tls>
               <modalityd_url>modality-ingest://localhost:14188</modalityd_url>
               <link_name>chassis</link_name>
