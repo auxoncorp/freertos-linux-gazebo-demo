@@ -6,6 +6,9 @@ additional-timeline-attributes = [
     "execution_context='demo'",
     "ci_commit='${GIT_COMMIT-local}'",
 ]
+override-timeline-attributes = [
+    "run_id='${MODALITY_RUN_ID-1}'",
+]
 
 [plugins.ingest.collectors.lttng-live]
 additional-timeline-attributes = [

@@ -1,6 +1,6 @@
 timeline-filters = ["_.execution_context = 'demo'"]
 
 [[segmentation-rule]]
-name = "segment-by-ingest"
-attributes = ["ingest_edge_id"]
-segment-name-template = "{timeline.ingest_edge_id}"
+name = "segment-by-run-id"
+attributes = ["execution_context", "run_id"]
+segment-name-template = "{timeline.execution_context}:{timeline.run_id}"

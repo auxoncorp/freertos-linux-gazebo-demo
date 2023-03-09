@@ -22,18 +22,7 @@
   ```bash
   export MODALITY_AUTH_TOKEN=$(< ~/.config/modality_cli/.user_auth_token)
   ```
-5. Run modality-reflector
+5. Run the system (starts modality-reflector and the detached docker containers), automatically stops after contact is made in gazebo
   ```bash
-  modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp
+  ./scripts/run-until-contact.sh
   ```
-6. Run the system (starts detached docker containers)
-  ```bash
-  ./scripts/start.sh
-  ```
-7. Press the "play" button in the Gazebo GUI to start the simulation
-
-
-When your done, run the stop script.
-```bash
-./scripts/stop.sh
-```
