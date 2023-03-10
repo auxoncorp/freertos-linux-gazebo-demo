@@ -1,0 +1,131 @@
+name: Demo
+on: [workflow_dispatch]
+
+env:
+  MODALITY_URL: "http://localhost:14181/v1/"
+  MODALITY_WORKSPACE: "demo"
+
+jobs:
+  demo:
+    name: Demo System
+    timeout-minutes: 30
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Print Environment
+        run: |
+          echo "GITHUB_WORKFLOW=$GITHUB_WORKFLOW"
+          echo "GITHUB_RUN_ID=$GITHUB_RUN_ID"
+          echo "GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+          echo "GITHUB_JOB=$GITHUB_JOB"
+          echo "GITHUB_ACTION=$GITHUB_ACTION"
+          echo "GITHUB_ACTOR=$GITHUB_ACTOR"
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "GITHUB_SHA=$GITHUB_SHA"
+
+      - name: Checkout Sources
+        uses: actions/checkout@v3
+
+      - name: Install Auxon Packages
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          wget --no-verbose --quiet https://get.keygen.sh/auxon-io/auxon.deb -O /tmp/auxon.deb
+          sudo apt-get install -y /tmp/auxon.deb
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends modalityd modality-client modality-reflector bridge-utils
+
+      - name: Setup Modality Server
+        run: |
+          sudo systemctl stop modalityd
+          echo 'license-key = "'"${{secrets.MODALITY_LICENSE_KEY}}"'"' | sudo tee -a /etc/modalityd/config.toml
+          sudo systemctl start modalityd
+          sudo systemctl status modalityd --no-pager --full
+
+      - name: Setup Initial Modality Configuration
+        run: |
+          modality config --modalityd ${{env.MODALITY_URL}}
+          modality user create admin
+          modality user create --use ci
+          modality user mint-auth-token --allow-http-api --allow-ingest --allow-mutation /tmp/auth-token
+          echo "MODALITY_AUTH_TOKEN=$(cat /tmp/auth-token)" >> $GITHUB_ENV
+          modality workspace create --use ${{env.MODALITY_WORKSPACE}} config/workspace.toml
+
+      - name: Update Reflector Plugins
+        run: |
+          sudo wget --no-verbose --quiet https://github.com/auxoncorp/modality-ctf-plugins/releases/latest/download/modality-lttng-live-collector -O /usr/lib/modality-reflector-plugins/collectors/modality-lttng-live-collector
+          sudo chmod +x /usr/lib/modality-reflector-plugins/collectors/modality-lttng-live-collector
+          sudo wget --no-verbose --quiet https://github.com/auxoncorp/modality-trace-recorder-plugin/releases/latest/download/modality-trace-recorder-tcp-collector -O /usr/lib/modality-reflector-plugins/collectors/modality-trace-recorder-tcp-collector
+          sudo chmod +x /usr/lib/modality-reflector-plugins/collectors/modality-trace-recorder-tcp-collector
+
+      - name: Configure Modality Client
+        env:
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+        run: |
+          modality config --modalityd ${{env.MODALITY_URL}}
+          modality workspace use ${{env.MODALITY_WORKSPACE}}
+
+      - name: Build System Docker Images
+        run: |
+          ./scripts/build.sh
+
+      - name: Run System
+        env:
+          GIT_COMMIT: ${{env.GITHUB_SHA}}
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+          DEMO_HEADLESS: 1
+          DOCKER_WITHOUT_NVIDIA: 1
+        run: |
+          sudo ./scripts/setup-network.sh &
+          sleep 1
+
+          mkdir -p /tmp/.X11-unix
+          touch /tmp/.docker.xauth
+
+          ./scripts/run-until-contact.sh
+
+      - name: Inspect Data
+        env:
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+        run: |
+          modality segment list
+          modality workspace list
+          modality workspace inspect ${{env.MODALITY_WORKSPACE}}
+
+      - name: Export Data
+        env:
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+        run: |
+          datetime=$(date +'%Y-%m-%dT%H-%M-%SZ')
+          tarfile=modality_demo_system_data_${datetime}.tar.gz
+          jsonfile=modality_demo_system_data_${datetime}.json
+
+          echo TARBALL_NAME=${tarfile} >> $GITHUB_ENV
+          echo JSON_NAME=${jsonfile} >> $GITHUB_ENV
+
+          modality internal basic-export --output-file /tmp/${jsonfile}
+          sudo systemctl stop modalityd
+          cp ~/.config/modality_cli/.user_auth_token /tmp/user_auth_token
+          cp ~/.config/modality_cli/workspace /tmp/workspace
+          sudo cp /tmp/user_auth_token /var/lib/modality/
+          sudo cp /tmp/workspace /var/lib/modality/
+          cd /tmp && sudo tar czvf ${tarfile} -C /var/lib modality
+
+      - name: Upload Modality Data
+        uses: actions/upload-artifact@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ env.TARBALL_NAME }}
+          path: /tmp/${{ env.TARBALL_NAME }}
+          retention-days: 2
+          if-no-files-found: error
+
+      - name: Upload json Data
+        uses: actions/upload-artifact@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          name: ${{ env.JSON_NAME }}
+          path: /tmp/${{ env.JSON_NAME }}
+          retention-days: 2
+          if-no-files-found: error
