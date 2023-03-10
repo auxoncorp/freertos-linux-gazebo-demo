@@ -50,4 +50,5 @@ RUN cd build && cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/gcc-toolchain.cmake -DCMAK
 RUN mkdir -p /root/.config/renode
 COPY docker/renode.config /root/.config/renode/config
 
-CMD ["renode", "/app/emulate.resc"]
+COPY docker/entrypoint.sh /
+CMD ["/entrypoint.sh"]

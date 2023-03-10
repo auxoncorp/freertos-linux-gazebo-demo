@@ -57,4 +57,5 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV GZ_SIM_SYSTEM_PLUGIN_PATH=/home/docker/gazebo_plugins:${GZ_SIM_SYSTEM_PLUGIN_PATH}
 ENV GZ_SIM_RESOURCE_PATH=/home/docker/gazebo_worlds:${GZ_SIM_RESOURCE_PATH}
 
-CMD ["gz", "sim", "-r", "demo_world.sdf"]
+COPY docker/entrypoint.sh /
+CMD ["/entrypoint.sh"]

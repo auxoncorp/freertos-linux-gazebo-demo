@@ -12,7 +12,7 @@ echo "MODALITY_RUN_ID = ${MODALITY_RUN_ID}"
 
 # TODO - use the reflector docker image
 # https://github.com/auxoncorp/freertos-linux-gazebo-demo/issues/1
-modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp &
+RUST_LOG=error modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp &
 refl_pid=$!
 
 sleep 2
@@ -29,11 +29,11 @@ done
 
 echo "Contact!"
 
-sleep 2
-
-./scripts/stop.sh
+sleep 4
 
 kill -SIGINT $refl_pid
 wait $refl_pid
+
+./scripts/stop.sh
 
 exit 0

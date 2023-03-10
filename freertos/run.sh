@@ -36,6 +36,7 @@ if [ -z "$container_id" ]; then
         --network=host \
         --name "$container_name" \
         $DOCKER_OPTS \
+        --env DEMO_HEADLESS \
         --env GZ_PARTITION=demo \
         --env DISPLAY=$DISPLAY \
         --env XAUTHORITY="$xauth" \

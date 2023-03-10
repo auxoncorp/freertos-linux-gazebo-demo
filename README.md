@@ -24,5 +24,6 @@
   ```
 5. Run the system (starts modality-reflector and the detached docker containers), automatically stops after contact is made in gazebo
   ```bash
+  # Set DEMO_HEADLESS env var to not run any of the GUIs (gazebo, renode, etc)
   ./scripts/run-until-contact.sh
   ```
