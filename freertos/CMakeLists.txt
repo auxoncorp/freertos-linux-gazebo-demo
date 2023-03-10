@@ -4,8 +4,6 @@ project(sensor-firmware LANGUAGES C ASM)
 
 include(FetchContent)
 
-set(COMMS_TASKS_TIMELINE_ID "453300b5-41e9-4baf-8f6d-3c4e70041b1b" CACHE STRING "Comms task timeline ID")
-
 message(STATUS "Fetching dependencies")
 
 FetchContent_Declare(
@@ -217,11 +215,15 @@ target_include_directories(
     config
     include)
 
+target_compile_options(
+    ${PROJECT_NAME}
+    PRIVATE
+    -Wno-stringop-truncation)
+
 target_compile_definitions(
     ${PROJECT_NAME}
     PRIVATE
-    HEAP4
-    COMMS_TASKS_TIMELINE_ID="${COMMS_TASKS_TIMELINE_ID}")
+    HEAP4)
 
 target_link_libraries(
     ${PROJECT_NAME}
