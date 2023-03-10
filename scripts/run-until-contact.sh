@@ -10,8 +10,6 @@ function get_num_contacts {
 export MODALITY_RUN_ID="$(uuidgen)"
 echo "MODALITY_RUN_ID = ${MODALITY_RUN_ID}"
 
-# TODO - use the reflector docker image
-# https://github.com/auxoncorp/freertos-linux-gazebo-demo/issues/1
 RUST_LOG=error modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp &
 refl_pid=$!
 

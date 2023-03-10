@@ -1,7 +1,6 @@
 #!/bin/bash
 
 set -euo pipefail
-set -x
 
 RENODE_OPTS="${RENODE_OPTS:-}"
 RENODE_TELNET_PORT="${RENODE_TELNET_PORT:-54543}"

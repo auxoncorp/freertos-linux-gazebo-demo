@@ -105,7 +105,7 @@
               <!-- <auth_token>YOUR_AUTH_TOKEN_HEX_HERE</auth_token> -->
               <timeline_name>robot_chassis</timeline_name>
               <allow_insecure_tls>true</allow_insecure_tls>
-              <modalityd_url>modality-ingest://localhost:14188</modalityd_url>
+              <modalityd_url>modality-ingest://127.0.0.1:14188</modalityd_url>
               <link_name>chassis</link_name>
               <pose>true</pose>
               <linear_acceleration>true</linear_acceleration>

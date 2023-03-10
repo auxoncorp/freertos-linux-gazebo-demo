@@ -20,7 +20,7 @@ override-timeline-attributes = [
 ]
 
 [plugins.ingest.collectors.lttng-live.metadata]
-url = 'net://localhost/host/demo-linux/linux'
+url = 'net://127.0.0.1/host/demo-linux/linux'
 
 [plugins.ingest.collectors.trace-recorder-tcp]
 additional-timeline-attributes = [

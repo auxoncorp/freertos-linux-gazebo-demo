@@ -13,7 +13,7 @@ if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
     chmod a+r "$xauth"
 fi
 
-DOCKER_OPTS="${DOCKER_OPTS:-}"
+DOCKER_OPTS="${DOCKER_OPTS:-"-it"}"
 if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
     docker_version=$(docker version --format '{{.Server.Version}}')
     if dpkg --compare-versions 19.03 gt "$docker_version" ; then
@@ -34,7 +34,7 @@ container_id=$(docker ps -aqf "ancestor=${container_image}")
 if [ -z "$container_id" ]; then
     container_name="demo-gz-sim"
     docker run \
-        -it --rm \
+        --rm \
         --network=host \
         --name "$container_name" \
         $DOCKER_OPTS \
