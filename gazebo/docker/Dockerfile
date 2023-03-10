@@ -1,35 +1,6 @@
-FROM ubuntu:jammy
-
-ENV NVIDIA_VISIBLE_DEVICES \
-   ${NVIDIA_VISIBLE_DEVICES:-all}
-ENV NVIDIA_DRIVER_CAPABILITIES \
-   ${NVIDIA_DRIVER_CAPABILITIES:+$NVIDIA_DRIVER_CAPABILITIES,}graphics
+FROM auxondemoimages/demo-gz-sim-base:latest
 
 ARG DEBIAN_FRONTEND=noninteractive
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-  git \
-  sudo \
-  tzdata \
-  locales \
-  wget \
-  gnupg \
-  lsb-release \
-  build-essential \
-  ca-certificates \
-  iproute2 \
-  netcat \
-  vim
-
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG en_US.UTF-8
-ENV LANGUAGE en_US:en
-ENV LC_ALL en_US.UTF-8
-
-RUN update-ca-certificates
-RUN wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
-RUN echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
-RUN apt-get update && apt-get install -y gz-garden
 
 RUN wget --no-verbose --quiet https://get.keygen.sh/auxon-io/auxon.deb -O auxon.deb
 RUN apt-get install -y ./auxon.deb

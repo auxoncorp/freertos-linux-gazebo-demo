@@ -38,7 +38,7 @@ if [ -z "$container_id" ]; then
         $DOCKER_OPTS \
         --env DEMO_HEADLESS \
         --env GZ_PARTITION=demo \
-        --env DISPLAY=$DISPLAY \
+        --env DISPLAY \
         --env XAUTHORITY="$xauth" \
         --env MODALITY_AUTH_TOKEN \
         --volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \

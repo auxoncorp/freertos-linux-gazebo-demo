@@ -19,7 +19,7 @@ if [ -z "$container_id" ]; then
         --name "$container_name" \
         $container_image
 else
-    docker exec --privileged -e DISPLAY -it $container_id bash
+    docker exec --privileged -it $container_id bash
 fi
 
 exit 0

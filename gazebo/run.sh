@@ -1,9 +1,10 @@
 #!/bin/bash
 
 set -euo pipefail
+set -x
 
 xauth=/tmp/.docker.xauth
-if [ ! -f "$xauth" ]; then
+if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
     xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
     if [ ! -z "$xauth_list" ]; then
         echo "$xauth_list" | xauth -f "$xauth" nmerge -
@@ -14,16 +15,18 @@ if [ ! -f "$xauth" ]; then
 fi
 
 DOCKER_OPTS="${DOCKER_OPTS:-}"
-docker_version=$(docker version --format '{{.Server.Version}}')
-if dpkg --compare-versions 19.03 gt "$docker_version" ; then
-    echo "Docker version is less than 19.03, using nvidia-docker2 runtime"
-    if [ ! dpkg --list | grep nvidia-docker2 ]; then
-        echo "Update docker to a version greater than 19.03 or install nvidia-docker2"
-        exit 1
+if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
+    docker_version=$(docker version --format '{{.Server.Version}}')
+    if dpkg --compare-versions 19.03 gt "$docker_version" ; then
+        echo "Docker version is less than 19.03, using nvidia-docker2 runtime"
+        if [ ! dpkg --list | grep nvidia-docker2 ]; then
+            echo "Update docker to a version greater than 19.03 or install nvidia-docker2"
+            exit 1
+        fi
+        DOCKER_OPTS="$DOCKER_OPTS --runtime=nvidia"
+    else
+        DOCKER_OPTS="$DOCKER_OPTS --gpus all"
     fi
-    DOCKER_OPTS="$DOCKER_OPTS --runtime=nvidia"
-else
-    DOCKER_OPTS="$DOCKER_OPTS --gpus all"
 fi
 
 container_image=${1:-demo-gz-sim}
@@ -37,7 +40,7 @@ if [ -z "$container_id" ]; then
         --name "$container_name" \
         $DOCKER_OPTS \
         --env GZ_PARTITION=demo \
-        --env DISPLAY=$DISPLAY \
+        --env DISPLAY \
         --env XAUTHORITY="$xauth" \
         --env MODALITY_AUTH_TOKEN \
         --env DEMO_HEADLESS \
