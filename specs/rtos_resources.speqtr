@@ -1,0 +1,13 @@
+behavior "FreeRTOS Resource Usage"
+    # The FreeRTOS runtime statistics event is logged periodically by the Stats task
+    when "a stats event is logged "
+        stats @ Stats AS task_stats
+    end
+
+    # The tasks stack high water mark is also tracked in the same
+    # runtime statistics structure.
+    # @requirement = "Stack Usage"
+    prohibited case "stack usage exceeds 80%"
+        (1.0 - (task_stats.stack_high_water / task_stats.stack_size)) > 0.80
+    end
+end

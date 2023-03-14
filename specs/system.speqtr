@@ -1,0 +1,64 @@
+behavior "Basic physical invariants"
+    prohibited case "Planar linear velocity is out of bounds"
+        linear_velocity@robot_chassis as vel
+          and
+        sqrt(sqr(vel.x) + sqr(vel.y)) > 1.0
+    end
+
+    prohibited case "Planar linear acceleration is out of bounds"
+        linear_acceleration@robot_chassis as accel
+          and
+        sqrt(sqr(accel.x) + sqr(accel.y)) > 10.0
+    end
+end
+
+behavior "Robot navigation"
+    prohibited case "The robot hits an obstacle"
+        # This data is coming from the simulator
+        contact@robot_chassis
+    end
+end
+
+behavior "Top-level control cycle"
+    when "Wheel speed is measured on micro"
+        wheel_speed@Sensor as sense -> wheel_speed@Sensor
+    end
+
+    nominal case "Linux brain plans and actuates"
+        sense
+          followed by
+        "actuator:target_velocity"@linux as plan
+          followed by
+        "actuator:set_pwm"@linux as act
+    end
+end
+
+behavior "Linux local control cycle"
+    when "Receive a msg from the micro"
+        "actuator:received_msg"@linux
+    end
+
+    nominal case "We make a plan, then send an actuation"
+        "actuator:target_velocity"@linux
+          followed by
+        "actuator:set_pwm"@linux
+    end
+
+    recovery case "Messages with a bad type are ignored"
+        "actuator:invalid_msg"@linux(_.reason.label = "BAD_TYPE")
+    end
+
+    # recovery case "Corrupt messages are ignored"
+    #     "actuator:invalid_msg"@linux(_.reason.label = "BAD_MAGIC0" or _.reason.label = "BAD_MAGIC1")
+    # end
+end
+
+behavior "Micro local control cycle"
+    when "Wheel speed is measured"
+        wheel_speed@Sensor -> wheel_speed@Sensor
+    end
+
+    nominal case "The measurement is sent to the brain"
+        comms_tx@Comms
+    end
+end

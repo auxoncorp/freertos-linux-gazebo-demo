@@ -1,4 +1,4 @@
-name: Demo
+name: Exercise the System
 on: [workflow_dispatch]
 
 env:
@@ -33,7 +33,7 @@ jobs:
           wget --no-verbose --quiet https://get.keygen.sh/auxon-io/auxon.deb -O /tmp/auxon.deb
           sudo apt-get install -y /tmp/auxon.deb
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends modalityd modality-client modality-reflector bridge-utils
+          sudo apt-get install -y --no-install-recommends modalityd modality-client modality-reflector conform bridge-utils
 
       - name: Setup Modality Server
         run: |
@@ -65,13 +65,19 @@ jobs:
           modality config --modalityd ${{env.MODALITY_URL}}
           modality workspace use ${{env.MODALITY_WORKSPACE}}
 
+      - name: Create Specs
+        env:
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+        run: |
+          conform spec create --file specs/rtos_resources.speqtr "RTOS Resources"
+          conform spec create --file specs/system.speqtr "System"
+
       - name: Build System Docker Images
         run: |
           ./scripts/build.sh
 
       - name: Run System
         env:
-          GIT_COMMIT: ${{env.GITHUB_SHA}}
           MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
           DEMO_HEADLESS: 1
           DOCKER_WITHOUT_NVIDIA: 1
@@ -91,6 +97,14 @@ jobs:
           modality segment list
           modality workspace list
           modality workspace inspect ${{env.MODALITY_WORKSPACE}}
+
+      - name: Evaluate Specs
+        continue-on-error: true
+        env:
+          MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
+        run: |
+          conform spec eval --name "RTOS Resources"
+          conform spec eval --name "System"
 
       - name: Export Data
         env:

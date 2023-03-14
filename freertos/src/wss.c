@@ -46,6 +46,7 @@ static void wss_task(void* params)
     (void) params;
 
     ch = xTraceRegisterString("wheel_speed");
+    vTaskDelay(WSS_POLL_PERIOD_MS * 2);
     next_wake = xTaskGetTickCount();
     while(1)
     {

@@ -4,7 +4,8 @@ plugins-dir = '/usr/lib/modality-reflector-plugins'
 [ingest]
 additional-timeline-attributes = [
     "execution_context='demo'",
-    "ci_commit='${GIT_COMMIT-local}'",
+    "ci_job='${GITHUB_JOB-local}'",
+    "ci_commit='${GITHUB_SHA-local}'",
 ]
 override-timeline-attributes = [
     "run_id='${MODALITY_RUN_ID-1}'",

@@ -142,27 +142,16 @@ void vApplicationIPNetworkEventHook(eIPCallbackEvent_t network_event)
     uint32_t dns_addr;
     char cBuffer[16];
 
-    printf("*******************************\n");
     if(network_event == eNetworkUp)
     {
         FreeRTOS_GetAddressConfiguration(&ip_addr, &net_mask, &gw_addr, &dns_addr);
         FreeRTOS_inet_ntoa(ip_addr, cBuffer);
         printf("IP Address: %s\n", cBuffer);
-
-        FreeRTOS_inet_ntoa(net_mask, cBuffer);
-        printf("Subnet Mask: %s\n", cBuffer);
-
-        FreeRTOS_inet_ntoa(gw_addr, cBuffer);
-        printf("Gateway Address: %s\n", cBuffer);
-
-        FreeRTOS_inet_ntoa(dns_addr, cBuffer);
-        printf("DNS Server Address: %s\n", cBuffer);
     }
     else
     {
         printf("Network down\n");
     }
-    printf("*******************************\n");
 }
 
 void HAL_ETH_MspInit(ETH_HandleTypeDef * heth)
