@@ -99,7 +99,7 @@ jobs:
           modality workspace inspect ${{env.MODALITY_WORKSPACE}}
 
       - name: Evaluate Specs
-        continue-on-error: true
+        #continue-on-error: true
         env:
           MODALITY_AUTH_TOKEN: ${{env.MODALITY_AUTH_TOKEN}}
         run: |
