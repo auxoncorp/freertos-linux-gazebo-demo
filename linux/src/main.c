@@ -8,6 +8,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <signal.h>
+#include <sched.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netinet/in.h>
@@ -59,9 +60,15 @@ int main(int argc, char** argv)
     fd_set fds;
     struct timeval tv = {0};
     struct sockaddr_in addr = {0};
+    cpu_set_t mask;
     actuator_s* actuator;
     (void) argc;
     (void) argv;
+
+    CPU_ZERO(&mask);
+    CPU_SET(0, &mask);
+    err = sched_setaffinity(0, sizeof(mask), &mask);
+    assert(err == 0);
 
     tracepoint(actuator, startup);
 

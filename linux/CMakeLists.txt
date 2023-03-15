@@ -11,6 +11,11 @@ add_executable(
     src/tp.c
     src/main.c)
 
+target_compile_definitions(
+    ${PROJECT_NAME}
+    PRIVATE
+    _GNU_SOURCE)
+
 target_compile_options(
     ${PROJECT_NAME}
     PRIVATE
