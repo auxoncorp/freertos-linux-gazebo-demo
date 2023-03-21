@@ -40,5 +40,5 @@ add_custom_command(
     TARGET run-sim
     POST_BUILD
     COMMAND
-    GZ_SIM_SYSTEM_PLUGIN_PATH=${CMAKE_BINARY_DIR} gz sim ${CMAKE_SOURCE_DIR}/world.sdf --verbose 3
+    GZ_SIM_SYSTEM_PLUGIN_PATH=${CMAKE_BINARY_DIR} gz sim -r ${CMAKE_SOURCE_DIR}/world.sdf --verbose 3
     COMMENT "Starting the example world")

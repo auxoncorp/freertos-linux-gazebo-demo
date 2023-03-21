@@ -48,6 +48,6 @@ use-timeline-id-channel = true
 
     [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
     channel = 'wheel_speed'
-    format-string = '%d'
-    attribute-keys = ['wheel_speed']
+    format-string = '%u %u %d'
+    attribute-keys = ['simulation_time_ms', 'seqnum', 'wheel_speed']
 

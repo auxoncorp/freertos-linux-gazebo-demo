@@ -15,6 +15,7 @@
 #define WSS_ADDR (0x50070000U)
 
 #define WSS_CTRL_INIT (1 << 0)
+#define WSS_CTRL_REQUEST_MEASUREMENT (1 << 2)
 #define WSS_CTRL_USING_SIMULATOR (1 << 7)
 #define WSS_STATUS_WHEEL_SPEED_VALID (1 << 0)
 
@@ -22,7 +23,9 @@ typedef struct
 {
     volatile uint32_t CTRL;         /* 0x00 : Control register */
     volatile uint32_t STATUS;       /* 0x04 : Status register */
-    volatile uint32_t WHEEL_SPEED;  /* 0x08 : Wheel speed register */
+    volatile uint32_t SIM_TIME;     /* 0x08 : Simulation time (ms) */
+    volatile uint32_t SEQNUM;       /* 0x0C : Simulation sequence number */
+    volatile uint32_t WHEEL_SPEED;  /* 0x10 : Wheel speed register */
 } __attribute__((packed)) WSS_s;
 
 static void wss_task(void* params);
@@ -40,6 +43,8 @@ void wss_init(void)
 
 static void wss_task(void* params)
 {
+    uint32_t sim_time_ms;
+    uint32_t seqnum;
     int32_t wheel_speed;
     traceString ch;
     TickType_t next_wake;
@@ -56,10 +61,14 @@ static void wss_task(void* params)
             WARN("WSS sensor task deadline missed");
         }
 
+        WSS->CTRL |= WSS_CTRL_REQUEST_MEASUREMENT;
+
         if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
         {
+            sim_time_ms = WSS->SIM_TIME;
+            seqnum = WSS->SEQNUM;
             wheel_speed = (int32_t) WSS->WHEEL_SPEED;
-            vTracePrintF(ch, "%d", wheel_speed);
+            vTracePrintF(ch, "%u %u %d", sim_time_ms, seqnum, wheel_speed);
             comms_send_sensor_data(wheel_speed);
         }
     }

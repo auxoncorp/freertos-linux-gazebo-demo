@@ -15,6 +15,8 @@
 
 #include "ImuRelay.hh"
 
+#define NS_PER_SEC (1000000000ULL)
+
 GZ_ADD_PLUGIN(
     emulation_support::ImuRelay,
     gz::sim::System,
@@ -96,8 +98,24 @@ void ImuRelay::Configure(
 
             if(this->data_ptr->connected)
             {
+                auto timestamp = msg.header().stamp();
+                uint64_t ts_ns = ((uint64_t) timestamp.sec()) * NS_PER_SEC;
+                ts_ns += (uint64_t) timestamp.nsec();
+
+                std::string seq = msg.header().data(1).value(0);
+
                 struct json_out out = JSON_OUT_BUF(this->data_ptr->json_buf, 512);
-                int size = json_printf(&out, "{wheel_speed: %lf}", msg.angular_velocity().z());
+                int size = json_printf(
+                        &out,
+                        "{sim_time: %llu, seqnum: %s, wheel_speed: %lf}",
+                        ts_ns,
+                        seq.c_str(),
+                        msg.angular_velocity().z());
+                if(size <= 0)
+                {
+                    gzerr << "Failed to encode message" << std::endl;
+                }
+
                 int err = write(this->data_ptr->sock, this->data_ptr->json_buf, size);
                 if(err == -1)
                 {
