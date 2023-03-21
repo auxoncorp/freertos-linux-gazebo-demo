@@ -113,9 +113,7 @@ int main(int argc, char** argv)
                         msg.magic1,
                         msg.type,
                         msg.seqnum,
-                        msg.wheel_speed,
-                        msg.seqnum, /* remote_nonce */
-                        &msg.tid[0] /* remote_timeline_id */);
+                        msg.wheel_speed);
 
                 if(msg.magic0 != WIRE_MAGIC0)
                 {

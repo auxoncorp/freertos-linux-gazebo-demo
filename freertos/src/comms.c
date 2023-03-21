@@ -20,66 +20,12 @@ static void comms_task(void* params);
 #define COMMS_QUEUE_LENGTH (8)
 static QueueHandle_t g_comms_queue = NULL;
 
-#define UID_W0() (*((volatile uint32_t*) 0x1FFF7A10))
-#define UID_W1() (*((volatile uint32_t*) 0x1FFF7A14))
-#define UID_W2() (*((volatile uint32_t*) 0x1FFF7A18))
-#define TID_NBYTES (16)
-#define TID_NCHARS ((TID_NBYTES * 2) + 4 + 1) /* 4 '-' chars, plus NULL */
-static char g_tid[TID_NCHARS] = {0};
-
-static void generate_tid(void)
-{
-    uint32_t word;
-    unsigned char raw_uuid[TID_NBYTES];
-    char hex_str[(TID_NBYTES * 2) + 1];
-    char* ptr;
-
-    // Use the 96-bit random device ID (randomly generated in renode)
-    word = UID_W0();
-    (void) memcpy(&raw_uuid[0], &word, sizeof(word));
-    (void) memcpy(&raw_uuid[12], &word, sizeof(word));
-    word = UID_W1();
-    (void) memcpy(&raw_uuid[4], &word, sizeof(word));
-    word = UID_W2();
-    (void) memcpy(&raw_uuid[8], &word, sizeof(word));
-
-    // Make sure bits are inline with RFC 4122 4.4
-    raw_uuid[6] = 0x40 | (raw_uuid[6] & 0xF0);
-    raw_uuid[8] = 0x80 | (raw_uuid[8] & 0x3F);
-
-    // Convert to hex string
-    ptr = &hex_str[0];
-    for(word = 0; word < TID_NBYTES; word += 1)
-    {
-        ptr += sprintf(ptr, "%02X", raw_uuid[word]);
-    }
-
-    // Add hyphens
-    memset(g_tid, '\0', TID_NCHARS);
-    strncpy(g_tid, &hex_str[0], 8);
-    strcat(g_tid, "-");
-    strncat(g_tid, &hex_str[8], 4);
-    strcat(g_tid, "-");
-    strncat(g_tid, &hex_str[12], 4);
-    strcat(g_tid, "-");
-    strncat(g_tid, &hex_str[16], 4);
-    strcat(g_tid, "-");
-    strncat(g_tid, &hex_str[20], 12);
-}
-
 void comms_init(void)
 {
-    generate_tid();
-
     g_comms_queue = xQueueCreate(COMMS_QUEUE_LENGTH, sizeof(comms_msg_s));
     configASSERT(g_comms_queue != NULL);
 
     xTaskCreate(comms_task, COMMS_NAME, COMMS_STACK_SIZE, NULL, COMMS_PRIO, NULL);
-
-    traceString ch = xTraceRegisterString("modality_timeline_id");
-    xTracePrintF(ch, "name=%s,id=%s", xTraceRegisterString(COMMS_NAME), xTraceRegisterString(g_tid));
-
-    printf(COMMS_NAME " timeline-id: %s\n", g_tid);
 }
 
 void comms_send_sensor_data(int32_t wheel_speed)
@@ -113,8 +59,6 @@ static void comms_task(void* params)
     struct freertos_sockaddr addr = {0};
     uint8_t mutator_state = 0;
     (void) params;
-
-    (void) memcpy(&wire_msg.tid[0], &g_tid[0], WIRE_TID_LEN);
 
     ch = xTraceRegisterString("comms_tx");
 
@@ -170,7 +114,7 @@ static void comms_task(void* params)
             }
         }
 
-        xTracePrintF(ch, "%u %u %d %u", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed, wire_msg.seqnum);
+        xTracePrintF(ch, "%u %u %d", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed);
 
         status = FreeRTOS_sendto(socket, &wire_msg, sizeof(wire_msg), 0, &addr, sizeof(addr));
         if(status < 0)

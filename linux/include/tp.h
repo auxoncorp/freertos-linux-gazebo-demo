@@ -40,9 +40,7 @@ TRACEPOINT_EVENT(
         uint8_t, magic1,
         uint8_t, type,
         uint32_t, seqnum,
-        int32_t, wheel_speed,
-        uint32_t, remote_nonce,
-        const char *, remote_timeline_id
+        int32_t, wheel_speed
     ),
     TP_FIELDS(
         ctf_integer_hex(int, magic0, magic0)
@@ -50,8 +48,6 @@ TRACEPOINT_EVENT(
         ctf_integer_hex(uint8_t, type, type)
         ctf_integer(uint32_t, seqnum, seqnum)
         ctf_integer(int32_t, wheel_speed, wheel_speed)
-        ctf_integer(uint32_t, remote_nonce, remote_nonce)
-        ctf_string(remote_timeline_id, remote_timeline_id)
     )
 )
 
