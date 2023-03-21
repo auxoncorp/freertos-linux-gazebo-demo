@@ -88,7 +88,7 @@ int main(int argc, char** argv)
     tracepoint(actuator, init);
 
     duty = 0;
-    tracepoint(actuator, set_pwm, duty);
+    tracepoint(actuator, set_pwm, actuator_seqnum(actuator), duty);
     actuator_set_vel(actuator, 0.0);
 
     while(g_exit_signaled == 0)
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
                     duty = clamped_duty(duty + 10);
                     double target_velocity = ((double) duty / 1000.0) * 1.0;
                     tracepoint(actuator, target_velocity, target_velocity);
-                    tracepoint(actuator, set_pwm, duty);
+                    tracepoint(actuator, set_pwm, actuator_seqnum(actuator), duty);
                     actuator_set_vel(actuator, target_velocity);
                 }
             }

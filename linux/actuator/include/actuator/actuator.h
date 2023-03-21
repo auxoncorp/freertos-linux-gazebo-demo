@@ -14,6 +14,8 @@ actuator_s* actuator_new();
 
 void actuator_free(actuator_s* act);
 
+uint32_t actuator_seqnum(actuator_s* act);
+
 void actuator_set_vel(actuator_s* act, double vel);
 
 #ifdef __cplusplus

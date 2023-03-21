@@ -83,9 +83,11 @@ TRACEPOINT_EVENT(
     actuator,
     set_pwm,
     TP_ARGS(
+        uint32_t, seqnum,
         uint16_t, duty
     ),
     TP_FIELDS(
+        ctf_integer(uint32_t, seqnum, seqnum)
         ctf_integer(uint16_t, duty, duty)
     )
 )

@@ -96,7 +96,7 @@ if request.isInit:
     seqNum = 0
     wheelSpeed = 0
     status = 0
-    g_msg_q = Queue(maxsize=10)
+    g_msg_q = Queue(maxsize=32)
     self.NoisyLog("Initializing wheel speed sensor")
 elif request.isRead:
     if request.offset == 0:         # CTRL
