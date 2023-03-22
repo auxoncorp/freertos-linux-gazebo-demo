@@ -13,7 +13,8 @@ RUN echo '%sudo ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 WORKDIR /home/docker/
 
 RUN mkdir -p /home/docker/gazebo_plugins /home/docker/gazebo_worlds
-RUN git clone --depth 1 https://github.com/auxoncorp/modality-gazebo.git
+RUN git clone --depth 1 https://github.com/auxoncorp/modality-gazebo.git --branch topic-based-interactions
+#RUN git clone --depth 1 https://github.com/auxoncorp/modality-gazebo.git
 RUN cd modality-gazebo && mkdir -p build && cd build && cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo .. && make -j && cp libModalityTracingPlugin.so /home/docker/gazebo_plugins/
 
 COPY imu_relay /home/docker/imu_relay

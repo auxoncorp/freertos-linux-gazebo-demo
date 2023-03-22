@@ -40,7 +40,7 @@ actuator_s* actuator_new()
     assert(msg->mutable_header() != NULL);
     auto seqnum_data = msg->mutable_header()->add_data();
     assert(seqnum_data != NULL);
-    seqnum_data->set_key("seqnum");
+    seqnum_data->set_key("seq");
 
     act->msg = msg;
     act->seqnum = 1;

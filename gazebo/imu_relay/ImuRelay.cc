@@ -33,7 +33,6 @@ class emulation_support::ImuRelayPrivate
         int sock;
         struct sockaddr_in servaddr;
         bool connected;
-        uint32_t seqnum;
         char json_buf[BUF_SIZE];
 };
 
@@ -80,7 +79,6 @@ void ImuRelay::Configure(
     this->data_ptr->servaddr.sin_family = AF_INET;
     this->data_ptr->servaddr.sin_addr.s_addr = inet_addr(addr.c_str());
     this->data_ptr->servaddr.sin_port = htons(port);
-    this->data_ptr->seqnum = 0;
 
     gzlog << "ImuRelay connecting to " << addr << ":" << port << std::endl;
 
@@ -104,15 +102,13 @@ void ImuRelay::Configure(
                 uint64_t ts_ns = ((uint64_t) timestamp.sec()) * NS_PER_SEC;
                 ts_ns += (uint64_t) timestamp.nsec();
 
-                this->data_ptr->seqnum += 1;
                 std::string native_seqnum = msg.header().data(1).value(0);
 
                 struct json_out out = JSON_OUT_BUF(this->data_ptr->json_buf, 512);
                 int size = json_printf(
                         &out,
-                        "{sim_time: %llu, seqnum: %lu, native_seqnum: %s, wheel_speed: %lf}",
+                        "{sim_time: %llu, seqnum: %s, wheel_speed: %lf}",
                         ts_ns,
-                        this->data_ptr->seqnum,
                         native_seqnum.c_str(),
                         msg.angular_velocity().z());
                 if(size <= 0)

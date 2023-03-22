@@ -111,6 +111,8 @@
               <linear_acceleration>true</linear_acceleration>
               <linear_velocity>true</linear_velocity>
               <contact_collision>true</contact_collision>
+              <published_interaction_topics>wheel_imu</published_interaction_topics>
+              <subscribed_interaction_topics>cmd_vel</subscribed_interaction_topics>
           </plugin>
 
             <pose relative_to='world'>0 0 0 0 0 0</pose>   <!--the pose is relative to the world by default-->
