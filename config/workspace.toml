@@ -1,5 +1,25 @@
 timeline-filters = ["_.execution_context = 'demo'"]
 
+custom-interactions = [
+"""
+   publish_message @ robot_chassis (_.topic = 'wheel_imu') as tx
+     -> wheel_speed @ Sensor as rx
+   AND tx.seqnum = rx.seqnum
+""",
+
+"""
+   comms_tx @ Comms as tx
+     -> actuator:received_msg @ linux as rx
+   AND tx.seqnum = rx.seqnum
+""",
+
+"""
+   actuator:set_pwm @ linux as tx
+     -> receive_message @ robot_chassis (_.topic = 'cmd_vel') as rx
+   AND tx.seqnum = rx.seqnum
+"""
+]
+
 [[segmentation-rule]]
 name = "segment-by-run-id"
 attributes = ["execution_context", "run_id"]
