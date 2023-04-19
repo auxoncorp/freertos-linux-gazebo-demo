@@ -6,7 +6,7 @@ extern "C" {
 #endif
 
 /* Print logging output to stdout in addition to the trace log */
-// #define LOGGING_STDOUT_MIRROR
+#define LOGGING_STDOUT_MIRROR
 
 #define INFO(fmt, ...) logging_info(fmt, ##__VA_ARGS__)
 #define WARN(fmt, ...) logging_warn(fmt, ##__VA_ARGS__)

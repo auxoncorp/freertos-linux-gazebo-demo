@@ -60,7 +60,7 @@ static void comms_task(void* params)
     uint8_t mutator_state = 0;
     (void) params;
 
-    ch = xTraceRegisterString("comms_tx");
+    //ch = xTraceRegisterString("comms_tx");
 
     while(FreeRTOS_IsNetworkUp() == pdFALSE)
     {
@@ -114,7 +114,7 @@ static void comms_task(void* params)
             }
         }
 
-        xTracePrintF(ch, "%u %u %d", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed);
+        //xTracePrintF(ch, "%u %u %d", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed);
 
         status = FreeRTOS_sendto(socket, &wire_msg, sizeof(wire_msg), 0, &addr, sizeof(addr));
         if(status < 0)

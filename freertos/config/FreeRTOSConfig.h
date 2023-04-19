@@ -51,7 +51,7 @@ void vAssertCalled(const char* file, int line);
 #define configUSE_CO_ROUTINES                            0
 #define configUSE_APPLICATION_TASK_TAG                   1
 #define configCHECK_FOR_STACK_OVERFLOW                   2
-#define configUSE_TRACE_FACILITY                         1
+#define configUSE_TRACE_FACILITY                         0
 
 #define configGENERATE_RUN_TIME_STATS                    1
 #define configRECORD_STACK_HIGH_ADDRESS                  1
@@ -130,16 +130,16 @@ void vAssertCalled(const char* file, int line);
 #define configMAC_ADDR4    0x34
 #define configMAC_ADDR5    0xAD
 
-/* Default IP address configuration, 192.0.2.80. */
-#define configIP_ADDR0      192
-#define configIP_ADDR1      0
-#define configIP_ADDR2      2
+/* Default IP address configuration, 172.0.2.80. */
+#define configIP_ADDR0      172
+#define configIP_ADDR1      18
+#define configIP_ADDR2      0
 #define configIP_ADDR3      80
 
-/* Default gateway IP address configuration, 192.0.2.254. */
-#define configGATEWAY_ADDR0 192
-#define configGATEWAY_ADDR1 0
-#define configGATEWAY_ADDR2 2
+/* Default gateway IP address configuration, 172.0.2.254. */
+#define configGATEWAY_ADDR0 172
+#define configGATEWAY_ADDR1 18
+#define configGATEWAY_ADDR2 0
 #define configGATEWAY_ADDR3 254
 
 /* Default netmask configuration. */
@@ -148,10 +148,10 @@ void vAssertCalled(const char* file, int line);
 #define configNET_MASK2     255
 #define configNET_MASK3     0
 
-/* Default DNS server configuration, 192.0.2.254. */
-#define configDNS_SERVER_ADDR0  192
-#define configDNS_SERVER_ADDR1  0
-#define configDNS_SERVER_ADDR2  2
+/* Default DNS server configuration, 172.0.2.254. */
+#define configDNS_SERVER_ADDR0  172
+#define configDNS_SERVER_ADDR1  18
+#define configDNS_SERVER_ADDR2  0
 #define configDNS_SERVER_ADDR3  254
 
 #include "trcRecorder.h"

@@ -1,0 +1,48 @@
+name = 'demo-system'
+
+[[world]]
+name = 'gazebo-world'
+    [world.provider.gazebo]
+    world-path = 'gazebo/demo_world.sdf'
+    headless = false
+    verbose = 3
+
+    [[world.connector]]
+    name = "net"
+
+[[machine]]
+name = 'renode-machine'
+bin = 'freertos/build/sensor-firmware'
+    [machine.provider.renode]
+    platform-descriptions = ['platforms/boards/stm32f4_discovery-kit.repl']
+    commands = [
+'''
+machine LoadPlatformDescriptionFromString
+"""
+// Just to make the FreeRTOS network interface PHY discovery less noisy
+phy2: Network.EthernetPhysicalLayer @ ethernet 2
+    Id1: 0x0000
+    Id2: 0x0000
+
+phy3: Network.EthernetPhysicalLayer @ ethernet 3
+    Id1: 0x0000
+    Id2: 0x0000
+"""
+''',
+        # Disable PHY1 from being probed
+        'sysbus.ethernet.phy1 Id1 0',
+        'sysbus.ethernet.phy1 Id2 0',
+        'showAnalyzer sysbus.usart3',
+        'sysbus.cpu PerformanceInMips 1',
+        'logLevel 3',
+    ]
+    disable-xwt = true
+    console = true
+
+    [[machine.connector]]
+    name = "net"
+    interface = "sysbus.ethernet"
+
+[[connection]]
+name = "net"
+type = "network"

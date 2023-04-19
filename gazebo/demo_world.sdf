@@ -24,11 +24,6 @@
             filename="gz-sim-imu-system"
             name="gz::sim::systems::Imu">
         </plugin>
-        <plugin name="emulation_support::ImuRelay" filename="ImuRelay">
-            <topic_name>wheel_imu</topic_name>
-            <port>44321</port>
-            <address>127.0.0.1</address>
-        </plugin>
 
         <light type="directional" name="sun">
             <cast_shadows>true</cast_shadows>
@@ -98,22 +93,6 @@
         </model>
 
         <model name='vehicle_blue' canonical_link='chassis'>
-          <plugin
-              name='modality_gz::Tracing'
-              filename='ModalityTracingPlugin'>
-              <enabled>true</enabled>
-              <!-- <auth_token>YOUR_AUTH_TOKEN_HEX_HERE</auth_token> -->
-              <timeline_name>robot_chassis</timeline_name>
-              <allow_insecure_tls>true</allow_insecure_tls>
-              <modalityd_url>modality-ingest://127.0.0.1:14188</modalityd_url>
-              <link_name>chassis</link_name>
-              <pose>true</pose>
-              <linear_acceleration>true</linear_acceleration>
-              <linear_velocity>true</linear_velocity>
-              <contact_collision>true</contact_collision>
-              <published_interaction_topics>wheel_imu</published_interaction_topics>
-              <subscribed_interaction_topics>cmd_vel</subscribed_interaction_topics>
-          </plugin>
 
             <pose relative_to='world'>0 0 0 0 0 0</pose>   <!--the pose is relative to the world by default-->
 

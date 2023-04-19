@@ -218,6 +218,8 @@ target_include_directories(
 target_compile_options(
     ${PROJECT_NAME}
     PRIVATE
+    -Wno-unused-variable
+    -Wno-unused-but-set-variable
     -Wno-stringop-truncation)
 
 target_compile_definitions(

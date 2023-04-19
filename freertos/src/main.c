@@ -30,6 +30,7 @@ int main(void)
     wss_init();
     stats_init();
 
+    /*
     configASSERT(xTraceDiagnosticsCheckStatus() == TRC_SUCCESS);
     const char* err = NULL;
     (void) xTraceErrorGetLast(&err);
@@ -38,6 +39,7 @@ int main(void)
         ERR("Trace error: %s", err);
     }
     configASSERT(err == NULL);
+    */
 
     INFO("System initialized");
     vTaskStartScheduler();

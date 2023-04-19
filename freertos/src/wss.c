@@ -50,7 +50,7 @@ static void wss_task(void* params)
     TickType_t next_wake;
     (void) params;
 
-    ch = xTraceRegisterString("wheel_speed");
+    //ch = xTraceRegisterString("wheel_speed");
     vTaskDelay(WSS_POLL_PERIOD_MS * 2);
     next_wake = xTaskGetTickCount();
     while(1)
@@ -63,12 +63,12 @@ static void wss_task(void* params)
 
         WSS->CTRL |= WSS_CTRL_REQUEST_MEASUREMENT;
 
-        if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
+        //if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
         {
             sim_time_ms = WSS->SIM_TIME;
             seqnum = WSS->SEQNUM;
             wheel_speed = (int32_t) WSS->WHEEL_SPEED;
-            vTracePrintF(ch, "%u %u %d", sim_time_ms, seqnum, wheel_speed);
+            //vTracePrintF(ch, "%u %u %d", sim_time_ms, seqnum, wheel_speed);
             comms_send_sensor_data(wheel_speed);
         }
     }

@@ -43,11 +43,13 @@ void vAssertCalled(const char* file, int line)
     taskDISABLE_INTERRUPTS();
     printf("vAssertCalled\n%s:%d\n", file, line);
 
+    /*
     (void) xTraceErrorGetLast(&err);
     if(err != NULL)
     {
         printf("xTraceErrorGetLast: %s\n", err);
     }
+    */
 
     while(1)
     {
