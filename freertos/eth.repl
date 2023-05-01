@@ -1,0 +1,7 @@
+phy2: Network.EthernetPhysicalLayer @ ethernet 2
+    Id1: 0x0000
+    Id2: 0x0000
+
+phy3: Network.EthernetPhysicalLayer @ ethernet 3
+    Id1: 0x0000
+    Id2: 0x0000

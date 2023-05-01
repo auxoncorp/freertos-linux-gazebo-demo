@@ -8,6 +8,10 @@ extern "C" {
 /* Print logging output to stdout in addition to the trace log */
 #define LOGGING_STDOUT_MIRROR
 
+#ifdef LOGGING_STDOUT_MIRROR
+#include <inttypes.h>
+#endif
+
 #define INFO(fmt, ...) logging_info(fmt, ##__VA_ARGS__)
 #define WARN(fmt, ...) logging_warn(fmt, ##__VA_ARGS__)
 #define ERR(fmt, ...) logging_error(fmt, ##__VA_ARGS__)

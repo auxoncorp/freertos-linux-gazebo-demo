@@ -2,6 +2,11 @@
 
 set -euo pipefail
 
-docker build -f docker/Dockerfile -t demo-freertos .
+(
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/gcc-toolchain.cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+    make -j
+)
 
 exit 0

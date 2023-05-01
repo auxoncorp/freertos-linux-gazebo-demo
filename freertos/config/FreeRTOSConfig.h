@@ -132,13 +132,13 @@ void vAssertCalled(const char* file, int line);
 
 /* Default IP address configuration, 172.0.2.80. */
 #define configIP_ADDR0      172
-#define configIP_ADDR1      18
+#define configIP_ADDR1      27
 #define configIP_ADDR2      0
 #define configIP_ADDR3      80
 
 /* Default gateway IP address configuration, 172.0.2.254. */
 #define configGATEWAY_ADDR0 172
-#define configGATEWAY_ADDR1 18
+#define configGATEWAY_ADDR1 27
 #define configGATEWAY_ADDR2 0
 #define configGATEWAY_ADDR3 254
 
@@ -150,7 +150,7 @@ void vAssertCalled(const char* file, int line);
 
 /* Default DNS server configuration, 172.0.2.254. */
 #define configDNS_SERVER_ADDR0  172
-#define configDNS_SERVER_ADDR1  18
+#define configDNS_SERVER_ADDR1  27
 #define configDNS_SERVER_ADDR2  0
 #define configDNS_SERVER_ADDR3  254
 

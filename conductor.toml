@@ -3,9 +3,10 @@ name = 'demo-system'
 [[world]]
 name = 'gazebo-world'
     [world.provider.gazebo]
-    world-path = 'gazebo/demo_world.sdf'
     headless = false
-    verbose = 3
+    world-path = 'gazebo/demo_world.sdf'
+    plugin-path = 'gazebo/imu_relay/build/'
+    gui-config-path = 'gazebo/gui.config'
 
     [[world.connector]]
     name = "net"
@@ -13,35 +14,37 @@ name = 'gazebo-world'
 [[machine]]
 name = 'renode-machine'
 bin = 'freertos/build/sensor-firmware'
-    [machine.provider.renode]
-    platform-descriptions = ['platforms/boards/stm32f4_discovery-kit.repl']
-    commands = [
-'''
-machine LoadPlatformDescriptionFromString
-"""
-// Just to make the FreeRTOS network interface PHY discovery less noisy
-phy2: Network.EthernetPhysicalLayer @ ethernet 2
-    Id1: 0x0000
-    Id2: 0x0000
+    [machine.assets]
+    'freertos/sensor_models/wss.py' = '/freertos/sensor_models/wss.py'
 
-phy3: Network.EthernetPhysicalLayer @ ethernet 3
-    Id1: 0x0000
-    Id2: 0x0000
-"""
-''',
+    [machine.provider.renode]
+    platform-descriptions = [
+        'platforms/boards/stm32f4_discovery-kit.repl',
+        'freertos/eth.repl',
+        'freertos/sensor_models/c_wss.repl',
+    ]
+    commands = [
         # Disable PHY1 from being probed
         'sysbus.ethernet.phy1 Id1 0',
         'sysbus.ethernet.phy1 Id2 0',
-        'showAnalyzer sysbus.usart3',
         'sysbus.cpu PerformanceInMips 1',
-        'logLevel 3',
     ]
-    disable-xwt = true
-    console = true
 
+    # Run 'nc localhost 3456' to see sensor-firmware's stdout
+    [[machine.connector]]
+    name = 'stdout'
+    interface = 'sysbus.usart3'
+    port = 3456
+    emit-config = false
+
+    # sudo tcpdump -i conductor0 udp port 9889 -vv -X
     [[machine.connector]]
     name = "net"
     interface = "sysbus.ethernet"
+
+[[connection]]
+name = 'stdout'
+type = 'uart'
 
 [[connection]]
 name = "net"

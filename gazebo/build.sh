@@ -2,6 +2,12 @@
 
 set -euo pipefail
 
-docker build -f docker/Dockerfile -t demo-gz-sim .
+(
+    cd imu_relay
+    mkdir -p build
+    cd build
+    cmake -DCMAKE_BUILD_TYPE=RelWithDebInfo ..
+    make -j
+)
 
 exit 0

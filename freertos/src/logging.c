@@ -29,12 +29,14 @@ void logging_init(void)
 void logging_info(const char* fmt, ...)
 {
     va_list vl;
+    /*
     traceResult tr;
 
     va_start(vl, fmt);
     tr = xTraceVPrintF(g_info_ch, fmt, vl);
     va_end(vl);
     configASSERT(tr == TRC_SUCCESS);
+    */
 
 #ifdef LOGGING_STDOUT_MIRROR
     va_start(vl, fmt);

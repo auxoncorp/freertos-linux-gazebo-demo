@@ -63,12 +63,13 @@ static void wss_task(void* params)
 
         WSS->CTRL |= WSS_CTRL_REQUEST_MEASUREMENT;
 
-        //if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
+        if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
         {
             sim_time_ms = WSS->SIM_TIME;
             seqnum = WSS->SEQNUM;
             wheel_speed = (int32_t) WSS->WHEEL_SPEED;
             //vTracePrintF(ch, "%u %u %d", sim_time_ms, seqnum, wheel_speed);
+            INFO("WSS: st=%lu sn=%lu ws=%" PRIi32 "", sim_time_ms, seqnum, wheel_speed);
             comms_send_sensor_data(wheel_speed);
         }
     }

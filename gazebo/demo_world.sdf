@@ -24,6 +24,11 @@
             filename="gz-sim-imu-system"
             name="gz::sim::systems::Imu">
         </plugin>
+        <plugin name="emulation_support::ImuRelay" filename="ImuRelay">
+            <topic_name>wheel_imu</topic_name>
+            <port>44321</port>
+            <address>127.0.0.1</address>
+        </plugin>
 
         <light type="directional" name="sun">
             <cast_shadows>true</cast_shadows>
@@ -93,7 +98,6 @@
         </model>
 
         <model name='vehicle_blue' canonical_link='chassis'>
-
             <pose relative_to='world'>0 0 0 0 0 0</pose>   <!--the pose is relative to the world by default-->
 
             <link name='chassis'>
