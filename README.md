@@ -1,5 +1,25 @@
 # System Demo
 
+## conductor notes
+
+Networking needs setup first (until we fix networking in conductor):
+```
+docker network create --subnet=192.0.2.1/24 --opt com.docker.network.bridge.name=conductor0 net
+```
+
+```
+# optional
+export NVIDIA_GPU=1
+
+conductor system build
+conductor system start
+```
+
+Should see the robot move/etc, can also sanity check by looking at the traffic from the embedded component:
+```
+sudo tcpdump -i conductor0 udp port 9889 -vv -X
+```
+
 ## Overview
 
 ![overview.png](diagrams/overview.png)
