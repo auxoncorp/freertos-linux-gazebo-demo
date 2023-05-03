@@ -40,7 +40,17 @@ bin = 'freertos/build/sensor-firmware'
     # sudo tcpdump -i conductor0 udp port 9889 -vv -X
     [[machine.connector]]
     name = "net"
-    interface = "sysbus.ethernet"
+    interface = 'sysbus.ethernet'
+
+[[machine]]
+name = 'linux-machine'
+    [machine.provider.container]
+    context = 'linux'
+    image = 'demo-linux'
+
+    [[machine.connector]]
+    name = "net"
+    interface = 'conductor0'
 
 [[connection]]
 name = 'stdout'
