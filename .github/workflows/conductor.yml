@@ -1,0 +1,84 @@
+name: Exercise the System With Conductor
+#on: [workflow_dispatch]
+on: [push]
+
+env:
+  DEBIAN_FRONTEND: "noninteractive"
+
+jobs:
+  demo:
+    name: Demo System
+    timeout-minutes: 30
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Print Environment
+        run: |
+          echo "GITHUB_WORKFLOW=$GITHUB_WORKFLOW"
+          echo "GITHUB_RUN_ID=$GITHUB_RUN_ID"
+          echo "GITHUB_RUN_NUMBER=$GITHUB_RUN_NUMBER"
+          echo "GITHUB_JOB=$GITHUB_JOB"
+          echo "GITHUB_ACTION=$GITHUB_ACTION"
+          echo "GITHUB_ACTOR=$GITHUB_ACTOR"
+          echo "GITHUB_REF=$GITHUB_REF"
+          echo "GITHUB_SHA=$GITHUB_SHA"
+          docker --version
+
+      - name: Checkout Sources
+        uses: actions/checkout@v3
+
+      - name: Install System Packages
+        run: |
+          sudo apt-get update
+          sudo wget https://packages.osrfoundation.org/gazebo.gpg -O /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] http://packages.osrfoundation.org/gazebo/ubuntu-stable $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/gazebo-stable.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends gz-garden gcc-arm-none-eabi libnewlib-arm-none-eabi build-essential cmake
+
+      - name: Install Conductor
+        run: |
+          # TODO - use a release artifact when we have one
+          git clone https://github.com/auxoncorp/conductor.git --branch demo-system-changes
+          cd conductor
+          cargo install --path conductor-cli
+          conductor --version
+
+      - name: System Build
+        run: |
+          cd freertos && ./build.sh && cd ..
+          cd gazebo && ./build.sh && cd ..
+          docker network create --subnet=192.0.2.1/24 --opt com.docker.network.bridge.name=conductor0 net
+          conductor system build
+
+      - name: System Graph
+        run: |
+          conductor system export graph -f mermaid --color --directed > system.mermaid
+          echo '## System' >> $GITHUB_STEP_SUMMARY
+          echo '```mermaid' >> $GITHUB_STEP_SUMMARY
+          cat system.mermaid >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: System Start
+        run: |
+          conductor system start
+
+      - name: Wait for Stopping Conditions
+        timeout-minutes: 10
+        env:
+          GZ_PARTITION: "gazebo-world"
+        run: |
+          sleep 1
+          gz topic -e -n 1 -t /world/Moving_robot/model/vehicle_blue/link/chassis/sensor/chassis_contact/contact
+
+      - name: System Stats
+        run: |
+          conductor system stats > stats.txt
+          cat stats.txt
+          echo '## Stats' >> $GITHUB_STEP_SUMMARY
+          echo '```text' >> $GITHUB_STEP_SUMMARY
+          cat stats.txt >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: System Stop
+        run: |
+          docker container list --no-trunc
+          docker stop $(docker ps -a -q)

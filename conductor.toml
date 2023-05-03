@@ -3,7 +3,6 @@ name = 'demo-system'
 [[world]]
 name = 'gazebo-world'
     [world.provider.gazebo]
-    headless = false
     world-path = 'gazebo/demo_world.sdf'
     plugin-path = 'gazebo/imu_relay/build/'
     gui-config-path = 'gazebo/gui.config'
@@ -30,14 +29,12 @@ bin = 'freertos/build/sensor-firmware'
         'sysbus.cpu PerformanceInMips 1',
     ]
 
-    # Run 'nc localhost 3456' to see sensor-firmware's stdout
     [[machine.connector]]
     name = 'stdout'
     interface = 'sysbus.usart3'
     port = 3456
     emit-config = false
 
-    # sudo tcpdump -i conductor0 udp port 9889 -vv -X
     [[machine.connector]]
     name = "net"
     interface = 'sysbus.ethernet'

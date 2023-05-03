@@ -15,9 +15,14 @@ conductor system build
 conductor system start
 ```
 
-Should see the robot move/etc, can also sanity check by looking at the traffic from the embedded component:
+You should see the robot move/etc, can also sanity check by looking at the traffic from the embedded component:
 ```
 sudo tcpdump -i conductor0 udp port 9889 -vv -X
+```
+
+You can view the firmware's stdout via netcat/etc:
+```
+nc localhost 3456
 ```
 
 ## Overview
