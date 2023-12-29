@@ -42,6 +42,7 @@ if [ -z "$container_id" ]; then
         --env DISPLAY \
         --env XAUTHORITY="$xauth" \
         --env MODALITY_AUTH_TOKEN \
+        --env MODALITY_RUN_ID \
         --env DEMO_HEADLESS \
         --volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
         --volume="$xauth:$xauth" \
