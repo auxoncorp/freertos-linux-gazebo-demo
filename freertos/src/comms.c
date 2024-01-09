@@ -10,9 +10,15 @@
 #include "wire_protocol.h"
 #include "comms.h"
 
+#define MSG_TYPE_WHEEL_SPEED (1)
+#define MSG_TYPE_VOLTAGE (2)
+
 typedef struct
 {
+    uint8_t type;
     int32_t wheel_speed;
+    int32_t millivolts;
+    uint8_t voltage_spike;
 } comms_msg_s;
 
 static void comms_task(void* params);
@@ -32,6 +38,7 @@ void comms_send_sensor_data(int32_t wheel_speed)
 {
     comms_msg_s msg =
     {
+        .type = MSG_TYPE_WHEEL_SPEED,
         .wheel_speed = wheel_speed,
     };
 
@@ -39,6 +46,22 @@ void comms_send_sensor_data(int32_t wheel_speed)
     if(was_posted != pdTRUE)
     {
         ERR("Failed to send sensor data");
+    }
+}
+
+void comms_send_voltage_data(int32_t millivolts, uint8_t voltage_spike)
+{
+    comms_msg_s msg =
+    {
+        .type = MSG_TYPE_VOLTAGE,
+        .millivolts = millivolts,
+        .voltage_spike = voltage_spike,
+    };
+
+    const BaseType_t was_posted = xQueueSend(g_comms_queue, &msg, 0);
+    if(was_posted != pdTRUE)
+    {
+        ERR("Failed to send voltage data");
     }
 }
 
@@ -58,6 +81,7 @@ static void comms_task(void* params)
     Socket_t socket = FREERTOS_INVALID_SOCKET;
     struct freertos_sockaddr addr = {0};
     uint8_t mutator_state = 0;
+    uint8_t voltage_spiked = 0;
     (void) params;
 
     ch = xTraceRegisterString("comms_tx");
@@ -86,13 +110,31 @@ static void comms_task(void* params)
     {
         const comms_msg_s comms_msg = comms_recv();
 
+        if(comms_msg.type == MSG_TYPE_VOLTAGE)
+        {
+            if(comms_msg.voltage_spike != 0)
+            {
+                // Mutate the next comms message
+                voltage_spiked = 1;
+                mutator_state += 1;
+                if(mutator_state == 3)
+                {
+                    mutator_state = 0;
+                }
+            }
+
+            continue;
+        }
+
+        configASSERT(comms_msg.type == MSG_TYPE_WHEEL_SPEED);
+
         wire_msg.magic0 = WIRE_MAGIC0;
         wire_msg.magic1 = WIRE_MAGIC1;
         wire_msg.type = WIRE_TYPE_WHEEL_SPEED;
         wire_msg.seqnum += 1;
         wire_msg.wheel_speed = comms_msg.wheel_speed;
 
-        if((wire_msg.seqnum > 10) && ((wire_msg.seqnum) % 5 == 0))
+        if(voltage_spiked != 0)
         {
             if(mutator_state == 0)
             {
@@ -104,14 +146,9 @@ static void comms_task(void* params)
             }
             else if(mutator_state == 2)
             {
-                wire_msg.type += 1;
+                wire_msg.type = WIRE_TYPE_WHEEL_SPEED + 1;
             }
-
-            mutator_state += 1;
-            if(mutator_state == 3)
-            {
-                mutator_state = 0;
-            }
+            voltage_spiked = 0;
         }
 
         xTracePrintF(ch, "%u %u %d", wire_msg.type, wire_msg.seqnum, wire_msg.wheel_speed);

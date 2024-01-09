@@ -202,6 +202,7 @@ add_executable(
     src/ip.c
     src/comms.c
     src/wss.c
+    src/voltage_monitor.c
     src/syscall.c
     src/hooks.c
     src/timer.c

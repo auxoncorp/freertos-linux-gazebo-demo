@@ -21,6 +21,7 @@ override-timeline-attributes = [
 ]
 
 [plugins.ingest.collectors.lttng-live.metadata]
+merge-stream-id = 0
 url = 'net://127.0.0.1/host/demo-linux/linux'
 
 [plugins.ingest.collectors.trace-recorder-tcp]
@@ -51,3 +52,12 @@ use-timeline-id-channel = true
     format-string = '%u %u %d'
     attribute-keys = ['simulation_time_ms', 'seqnum', 'wheel_speed']
 
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'voltage'
+    format-string = '%d'
+    attribute-keys = ['voltage']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'voltage_spike'
+    format-string = '%d'
+    attribute-keys = ['voltage']

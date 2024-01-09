@@ -7,7 +7,7 @@ function get_num_contacts {
     echo "$cnt"
 }
 
-export MODALITY_RUN_ID="$(uuidgen)"
+export MODALITY_RUN_ID="${MODALITY_RUN_ID:-$(uuidgen)}"
 echo "MODALITY_RUN_ID = ${MODALITY_RUN_ID}"
 
 RUST_LOG=error modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp &
@@ -17,7 +17,7 @@ sleep 2
 
 ./scripts/start.sh
 
-sleep 1
+sleep 10
 
 while [ $(get_num_contacts) -eq 0 ]
 do
@@ -33,5 +33,7 @@ kill -SIGINT $refl_pid
 wait $refl_pid
 
 ./scripts/stop.sh
+
+modality internal sync-indices
 
 exit 0

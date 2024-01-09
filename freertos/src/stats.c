@@ -168,6 +168,10 @@ static uint32_t task_stack_size(const char* name)
     {
         stack_size = EMAC_STACK_SIZE;
     }
+    else if(strncmp(name, VOLTAGE_MONITOR_NAME, configMAX_TASK_NAME_LEN) == 0)
+    {
+        stack_size = VOLTAGE_MONITOR_STACK_SIZE;
+    }
 
     configASSERT(stack_size != 0);
     return stack_size;
