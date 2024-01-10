@@ -18,6 +18,7 @@
 #define WSS_CTRL_REQUEST_MEASUREMENT (1 << 2)
 #define WSS_CTRL_USING_SIMULATOR (1 << 7)
 #define WSS_STATUS_WHEEL_SPEED_VALID (1 << 0)
+#define WSS_STATUS_BUMP_DETECTED (1 << 1)
 
 typedef struct
 {
@@ -47,10 +48,12 @@ static void wss_task(void* params)
     uint32_t seqnum;
     int32_t wheel_speed;
     traceString ch;
+    traceString bump_det_ch;
     TickType_t next_wake;
     (void) params;
 
     ch = xTraceRegisterString("wheel_speed");
+    bump_det_ch = xTraceRegisterString("bump_detected");
     vTaskDelay(WSS_POLL_PERIOD_MS * 2);
     next_wake = xTaskGetTickCount();
     while(1)
@@ -63,12 +66,19 @@ static void wss_task(void* params)
 
         WSS->CTRL |= WSS_CTRL_REQUEST_MEASUREMENT;
 
-        if((WSS->STATUS & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
+        const uint32_t status = WSS->STATUS;
+        if((status & WSS_STATUS_WHEEL_SPEED_VALID) != 0)
         {
             sim_time_ms = WSS->SIM_TIME;
             seqnum = WSS->SEQNUM;
             wheel_speed = (int32_t) WSS->WHEEL_SPEED;
             vTracePrintF(ch, "%u %u %d", sim_time_ms, seqnum, wheel_speed);
+
+            if((status & WSS_STATUS_BUMP_DETECTED) != 0)
+            {
+                vTracePrintF(bump_det_ch, "%d", status);
+            }
+
             comms_send_sensor_data(wheel_speed);
         }
     }

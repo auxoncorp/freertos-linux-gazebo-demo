@@ -24,3 +24,4 @@ custom-interactions = [
 name = "segment-by-run-id"
 attributes = ["execution_context", "run_id"]
 segment-name-template = "{timeline.execution_context}:{timeline.run_id}"
+causally-partition-segments = true

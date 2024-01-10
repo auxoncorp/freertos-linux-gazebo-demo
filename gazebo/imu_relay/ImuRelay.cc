@@ -10,6 +10,7 @@
 #include <gz/sim/Util.hh>
 #include <gz/transport/Node.hh>
 #include <gz/msgs/imu.pb.h>
+#include <gz/msgs/contacts.pb.h>
 
 #include "frozen.h"
 
@@ -22,7 +23,7 @@ GZ_ADD_PLUGIN(
     gz::sim::System,
     emulation_support::ImuRelay::ISystemConfigure)
 
-#define BUF_SIZE (512)
+#define BUF_SIZE (1024)
 
 using namespace emulation_support;
 
@@ -33,6 +34,7 @@ class emulation_support::ImuRelayPrivate
         int sock;
         struct sockaddr_in servaddr;
         bool connected;
+        bool bump_detected;
         char json_buf[BUF_SIZE];
 };
 
@@ -40,6 +42,7 @@ ImuRelay::ImuRelay(): System(), data_ptr(std::make_unique<ImuRelayPrivate>())
 {
     this->data_ptr->sock = -1;
     this->data_ptr->connected = false;
+    this->data_ptr->bump_detected = false;
     memset(&this->data_ptr->servaddr, 0, sizeof(this->data_ptr->servaddr));
 }
 
@@ -82,6 +85,16 @@ void ImuRelay::Configure(
 
     gzlog << "ImuRelay connecting to " << addr << ":" << port << std::endl;
 
+    auto contact_msg_cb = std::function<void(const gz::msgs::Contacts &)>(
+        [this](const gz::msgs::Contacts &msg)
+        {
+            if(!this->data_ptr->bump_detected)
+            {
+                gzlog << "CONTACT" << std::endl;
+                this->data_ptr->bump_detected = true;
+            }
+        });
+
     auto msg_cb = std::function<void(const gz::msgs::IMU &)>(
         [this](const gz::msgs::IMU &msg)
         {
@@ -89,9 +102,10 @@ void ImuRelay::Configure(
             {
                 if(connect(this->data_ptr->sock, (struct sockaddr*) &this->data_ptr->servaddr, sizeof(this->data_ptr->servaddr)) != 0)
                 {
-                    gzerr << "Failed to connect to IMU relay server" << std::endl;
                     return;
                 }
+
+                gzlog << "Connected to IMU relay server" << std::endl;
 
                 this->data_ptr->connected = true;
             }
@@ -104,12 +118,15 @@ void ImuRelay::Configure(
 
                 std::string native_seqnum = msg.header().data(1).value(0);
 
-                struct json_out out = JSON_OUT_BUF(this->data_ptr->json_buf, 512);
+                //gzdbg << "seqnum: " << native_seqnum << ", bump: " << this->data_ptr->bump_detected << std::endl;
+
+                struct json_out out = JSON_OUT_BUF(this->data_ptr->json_buf, BUF_SIZE);
                 int size = json_printf(
                         &out,
-                        "{sim_time: %llu, seqnum: %s, wheel_speed: %lf}",
+                        "{sim_time: %llu, seqnum: %s, bump: %d, wheel_speed: %lf}",
                         ts_ns,
                         native_seqnum.c_str(),
+                        this->data_ptr->bump_detected ? 1 : 0,
                         msg.angular_velocity().z());
                 if(size <= 0)
                 {
@@ -128,6 +145,15 @@ void ImuRelay::Configure(
     {
         gzerr << "Subscriber could not be created for topic ["
             << topic_name << "] with message type [IMU]" << std::endl;
+        return;
+    }
+
+    // TODO - cfg for this
+    auto contact_topic_name = gz::transport::TopicUtils::AsValidTopic("/world/Moving_robot/model/vehicle_blue/link/chassis/sensor/chassis_contact/contact");
+    if(!this->data_ptr->node.Subscribe(contact_topic_name, contact_msg_cb))
+    {
+        gzerr << "Subscriber could not be created for topic ["
+            << contact_topic_name << "] with message type [Contacts]" << std::endl;
         return;
     }
 }

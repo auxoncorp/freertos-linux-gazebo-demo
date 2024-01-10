@@ -27,7 +27,7 @@ done
 
 echo "Contact!"
 
-sleep 4
+sleep 10
 
 kill -SIGINT $refl_pid
 wait $refl_pid

@@ -105,12 +105,13 @@
               <!-- <auth_token>YOUR_AUTH_TOKEN_HEX_HERE</auth_token> -->
               <timeline_name>robot_chassis</timeline_name>
               <allow_insecure_tls>true</allow_insecure_tls>
-              <modalityd_url>modality-ingest://127.0.0.1:14188</modalityd_url>
+              <ingest_parent_url>modality-ingest://127.0.0.1:14188</ingest_parent_url>
               <link_name>chassis</link_name>
               <pose>true</pose>
               <linear_acceleration>true</linear_acceleration>
               <linear_velocity>true</linear_velocity>
               <contact_collision>true</contact_collision>
+              <sample_n_iters>100</sample_n_iters>
               <published_interaction_topics>wheel_imu</published_interaction_topics>
               <subscribed_interaction_topics>cmd_vel</subscribed_interaction_topics>
           </plugin>

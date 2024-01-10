@@ -61,3 +61,8 @@ use-timeline-id-channel = true
     channel = 'voltage_spike'
     format-string = '%d'
     attribute-keys = ['voltage']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'bump_detected'
+    format-string = '%d'
+    attribute-keys = ['status']

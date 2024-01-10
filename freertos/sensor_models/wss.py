@@ -9,6 +9,7 @@ CTRL_INIT = (1 << 0)
 CTRL_REQUEST_MEASUREMENT = (1 << 2)
 CTRL_USING_SIMULATOR = (1 << 7)
 STATUS_WHEEL_SPEED_VALID = (1 << 0)
+STATUS_BUMP_DETECTED = (1 << 1)
 
 global g_msg_q
 
@@ -75,7 +76,7 @@ class ImuRelayServer(SocketServer):
     def onmessage(self, client, message):
         global g_msg_q
         data = json.loads(message)
-        #print "WSS recvd msg - sim_time=%d, seqnum=%d, wheel_speed=%f" % (data['sim_time'], data['seqnum'], data['wheel_speed'])
+        #print "WSS recvd msg - sim_time=%d, seqnum=%d, bump=%d, wheel_speed=%f" % (data['sim_time'], data['seqnum'], data["bump"], data['wheel_speed'])
         try:
             g_msg_q.put_nowait(data)
         except Full:
@@ -94,6 +95,7 @@ def run_server():
 if request.isInit:
     simTimeNs = 0
     seqNum = 0
+    bumpDetected = 0
     wheelSpeed = 0
     status = 0
     g_msg_q = Queue(maxsize=32)
@@ -123,9 +125,12 @@ elif request.isWrite:
                 msg = g_msg_q.get_nowait()
                 simTimeNs = msg['sim_time']
                 seqNum = msg['seqnum']
+                bumpDetected = msg['bump']
                 wheelSpeed = msg['wheel_speed']
                 status |= STATUS_WHEEL_SPEED_VALID
-                #self.NoisyLog("sim_time=%d, seqnum=%d, wheel_speed=%f" % (simTimeNs, seqNum, wheelSpeed))
+                if bumpDetected:
+                    status |= STATUS_BUMP_DETECTED
+                #self.NoisyLog("sim_time=%d, seqnum=%d, bump=%d, wheel_speed=%f" % (simTimeNs, seqNum, bumpDetected, wheelSpeed))
             except Empty:
                 pass
 
