@@ -16,7 +16,7 @@
   ```
 3. In a separate terminal, run the networking setup script
   ```bash
-  sudo ./scripts/setup-networking.sh
+  sudo ./scripts/setup-network.sh
   ```
 4. Export your auth token (in each terminal used)
   ```bash
