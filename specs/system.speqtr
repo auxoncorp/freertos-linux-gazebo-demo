@@ -1,64 +1,75 @@
+# @project_id = "WALLBOT"
+# @safety_id = "WALLBOT-FMEA"
+
+# @functional_requirement_id = "WALLBOT-1"
 behavior "Basic physical invariants"
+    # @functional_requirement_id = "WALLBOT-1.1"
     prohibited case "Planar linear velocity is out of bounds"
-        linear_velocity@robot_chassis as vel
-          and
-        sqrt(sqr(vel.x) + sqr(vel.y)) > 1.0
+        linear_velocity@robot_chassis( sqrt(sqr(_.x) + sqr(_.y)) > 1.0) 
     end
 
+    # @functional_requirement_id = "WALLBOT-1.2"
     prohibited case "Planar linear acceleration is out of bounds"
-        linear_acceleration@robot_chassis as accel
-          and
-        sqrt(sqr(accel.x) + sqr(accel.y)) > 10.0
+        linear_acceleration@robot_chassis(sqrt(sqr(_.x) + sqr(_.y)) > 10.0)
     end
 end
 
-behavior "Robot navigation"
-    prohibited case "The robot hits an obstacle"
-        # This data is coming from the simulator
-        contact@robot_chassis
-    end
-end
-
-behavior "Top-level control cycle"
-    when "Wheel speed is measured on micro"
-        wheel_speed@Sensor as sense -> wheel_speed@Sensor
-    end
-
-    nominal case "Linux brain plans and actuates"
-        sense
-          followed by
-        "actuator:target_velocity"@linux as plan
-          followed by
-        "actuator:set_pwm"@linux as act
-    end
-end
-
+# @functional_requirement_id = "WALLBOT-2"
 behavior "Linux local control cycle"
     when "Receive a msg from the micro"
         "actuator:received_msg"@linux
     end
 
+    until "The next message"
+        "actuator:received_msg"@linux
+    end
+
+    # @functional_requirement_id = "WALLBOT-2.1"
     nominal case "We make a plan, then send an actuation"
         "actuator:target_velocity"@linux
           followed by
         "actuator:set_pwm"@linux
     end
 
+    # @functional_requirement_id = "WALLBOT-3.2"
+    # @safety_requirement_id = "WALLBOT-FMEA-3.7"
     recovery case "Messages with a bad type are ignored"
         "actuator:invalid_msg"@linux(_.reason.label = "BAD_TYPE")
     end
 
-    # recovery case "Corrupt messages are ignored"
-    #     "actuator:invalid_msg"@linux(_.reason.label = "BAD_MAGIC0" or _.reason.label = "BAD_MAGIC1")
-    # end
+    # @functional_requirement_id = "WALLBOT-3.3"
+    # @safety_requirement_id = "WALLBOT-FMEA-3.7"
+    recovery case "Corrupt messages are ignored"
+        "actuator:invalid_msg"@linux(_.reason.label = "BAD_MAGIC-2" or _.reason.label = "BAD_MAGIC1")
+    end
 end
 
 behavior "Micro local control cycle"
     when "Wheel speed is measured"
-        wheel_speed@Sensor -> wheel_speed@Sensor
+        wheel_speed@Sensor 
+    end
+
+    until "Next cycle"
+        wheel_speed@Sensor 
     end
 
     nominal case "The measurement is sent to the brain"
         comms_tx@Comms
+    end
+end
+
+behavior 'Contact events are detected by the micro'
+    when 'The first contact event is detected'
+        contact@robot_chassis not preceded by contact@robot_chassis
+    end
+
+    nominal case 'Micro detects a bump'
+        bump_detected@Sensor
+    end
+end
+
+behavior "Robot stays in the desired area"
+    prohibited case "Robot crosses the boundary lines"
+        linear_velocity@robot_chassis(_.x > 0.2 or _.x < -0.2 or _.y > 1.0 or _.y < -1.0) 
     end
 end
