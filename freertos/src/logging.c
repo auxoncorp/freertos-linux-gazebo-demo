@@ -32,7 +32,7 @@ void logging_info(const char* fmt, ...)
     traceResult tr;
 
     va_start(vl, fmt);
-    tr = xTraceVPrintF(g_info_ch, fmt, vl);
+    tr = xTraceVPrintF(g_info_ch, fmt, &vl);
     va_end(vl);
     configASSERT(tr == TRC_SUCCESS);
 
@@ -50,7 +50,7 @@ void logging_warn(const char* fmt, ...)
     traceResult tr;
 
     va_start(vl, fmt);
-    tr = xTraceVPrintF(g_warn_ch, fmt, vl);
+    tr = xTraceVPrintF(g_warn_ch, fmt, &vl);
     va_end(vl);
     configASSERT(tr == TRC_SUCCESS);
 
@@ -68,7 +68,7 @@ void logging_error(const char* fmt, ...)
     traceResult tr;
 
     va_start(vl, fmt);
-    tr = xTraceVPrintF(g_err_ch, fmt, vl);
+    tr = xTraceVPrintF(g_err_ch, fmt, &vl);
     va_end(vl);
     configASSERT(tr == TRC_SUCCESS);
 

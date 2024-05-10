@@ -21,7 +21,7 @@ FetchContent_Declare(
 FetchContent_Declare(
     tracerecorder
     GIT_REPOSITORY "https://github.com/percepio/TraceRecorderSource.git"
-    GIT_TAG "Tz4/4.6/v4.6.6"
+    GIT_TAG "Tz4/4.8/v4.8.2"
 )
 
 FetchContent_Declare(

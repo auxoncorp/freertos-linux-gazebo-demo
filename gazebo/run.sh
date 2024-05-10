@@ -2,6 +2,10 @@
 
 set -euo pipefail
 
+if [ ! -v MODALITY_AUTH_TOKEN ]; then
+    export MODALITY_AUTH_TOKEN=$(modality user auth-token)
+fi
+
 xauth=/tmp/.docker.xauth
 if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
     xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
@@ -26,6 +30,8 @@ if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
     else
         DOCKER_OPTS="$DOCKER_OPTS --gpus all"
     fi
+else
+    DOCKER_OPTS="$DOCKER_OPTS --device /dev/dri"
 fi
 
 container_image=${1:-demo-gz-sim}
