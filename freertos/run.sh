@@ -26,6 +26,8 @@ if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
     else
         DOCKER_OPTS="$DOCKER_OPTS --gpus all"
     fi
+else
+    DOCKER_OPTS="$DOCKER_OPTS --device /dev/dri"
 fi
 
 container_image=${1:-demo-freertos}

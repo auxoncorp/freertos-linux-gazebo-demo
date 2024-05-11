@@ -6,6 +6,7 @@ RUN echo "demo-linux" > /etc/hostname
 
 RUN mkdir /lttng && echo 'LTTNG_HOME=/lttng' >> /etc/environment
 ENV LTTNG_HOME /lttng
+RUN mkdir -p /lttng/shm
 
 RUN mkdir -p /actuator-lib/src /actuator-lib/include /actuator-lib/build
 COPY actuator/CMakeLists.txt /actuator-lib

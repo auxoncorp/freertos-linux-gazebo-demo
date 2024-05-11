@@ -20,7 +20,7 @@
   ```
 4. Export your auth token (in each terminal used)
   ```bash
-  export MODALITY_AUTH_TOKEN=$(< ~/.config/modality_cli/.user_auth_token)
+  export MODALITY_AUTH_TOKEN=$(modality user auth-token)
   ```
 5. Run the system (starts modality-reflector and the detached docker containers), automatically stops after contact is made in gazebo
   ```bash
