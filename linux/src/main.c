@@ -21,6 +21,8 @@
 #define TRACEPOINT_DEFINE
 #include "tp.h"
 
+static const char LISTEN_ADDR[] = "192.0.2.81";
+
 static volatile sig_atomic_t g_exit_signaled = 0;
 
 static void sigint_handler(int sig)
@@ -79,7 +81,7 @@ int main(int argc, char** argv)
 
     addr.sin_family = AF_INET;
     addr.sin_port = htons(SENSOR_DATA_PORT);
-    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_addr.s_addr = inet_addr(LISTEN_ADDR);
     err = bind(msg_socket, (const struct sockaddr*) &addr, sizeof(addr));
     assert(err == 0);
 
@@ -106,6 +108,7 @@ int main(int argc, char** argv)
 
             if(msg_size == WIRE_MSG_SIZE)
             {
+                printf("got msg\n");
                 tracepoint(
                         actuator,
                         received_msg,

@@ -3,6 +3,7 @@
 BRIDGE="demo-network"
 HWADDR="00:00:5e:01:23:ff"
 ADDR="192.0.2.2/24"
+VMADDR="192.0.2.81"
 ROUTE="192.0.2.0/24"
 RENODETAP="renode-tap0"
 VMTAP="linux-tap"
@@ -29,6 +30,7 @@ brctl addif $BRIDGE $RENODETAP
 
 echo "Adding tap '$VMTAP'"
 ip tuntap add dev $VMTAP mode tap
+ip address add $VMADDR dev $VMTAP
 ip link set dev $VMTAP up
 brctl addif $BRIDGE $VMTAP
 

@@ -96,7 +96,7 @@ static void comms_task(void* params)
             configIP_ADDR0,
             configIP_ADDR1,
             configIP_ADDR2,
-            255);
+            81);
 
     socket = FreeRTOS_socket(
             FREERTOS_AF_INET,
