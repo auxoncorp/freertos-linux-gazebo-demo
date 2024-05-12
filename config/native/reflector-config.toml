@@ -1,0 +1,70 @@
+[plugins]
+plugins-dir = '/usr/lib/modality-reflector-plugins'
+
+[ingest]
+additional-timeline-attributes = [
+    "execution_context='demo'",
+    "ci_job='${GITHUB_JOB-local}'",
+    "ci_commit='${GITHUB_SHA-local}'",
+]
+override-timeline-attributes = [
+    "run_id='${MODALITY_RUN_ID-1}'",
+]
+
+[plugins.ingest.collectors.lttng-live]
+additional-timeline-attributes = [
+    "platform='linux'",
+    "module='actuator'",
+]
+override-timeline-attributes = [
+    "name='linux'",
+]
+
+[plugins.ingest.collectors.lttng-live.metadata]
+merge-stream-id = 0
+url = 'net://127.0.0.1/host/demo/linux'
+
+[plugins.ingest.collectors.trace-recorder-tcp]
+additional-timeline-attributes = [
+    "platform='FreeRTOS'",
+    "module='sensor'",
+]
+
+[plugins.ingest.collectors.trace-recorder-tcp.metadata]
+startup-task-name = 'init'
+user-event-channel = true
+remote = "192.0.2.80:8888"
+connect-timeout = "60s"
+use-timeline-id-channel = true
+interaction-mode = 'fully-linearized'
+include-unknown-events = false
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'stats'
+    format-string = '%s %u %d %u %u'
+    attribute-keys = ['task', 'stack_size', 'stack_high_water', 'task_run_time', 'total_run_time']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'comms_tx'
+    format-string = '%u %u %d'
+    attribute-keys = ['type', 'seqnum', 'wheel_speed']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'wheel_speed'
+    format-string = '%u %u %d'
+    attribute-keys = ['simulation_time_ms', 'seqnum', 'wheel_speed']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'voltage'
+    format-string = '%d'
+    attribute-keys = ['voltage']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'voltage_spike'
+    format-string = '%d'
+    attribute-keys = ['voltage']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'bump_detected'
+    format-string = '%d'
+    attribute-keys = ['status']

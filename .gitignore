@@ -10,3 +10,4 @@
 /gazebo/imu_relay/build
 
 .runids
+.vagrant/
