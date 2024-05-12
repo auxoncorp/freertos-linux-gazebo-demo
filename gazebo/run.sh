@@ -6,16 +6,16 @@ if [ ! -v MODALITY_AUTH_TOKEN ]; then
     export MODALITY_AUTH_TOKEN=$(modality user auth-token)
 fi
 
-xauth=/tmp/.docker.xauth
-if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
-    xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
-    if [ ! -z "$xauth_list" ]; then
-        echo "$xauth_list" | xauth -f "$xauth" nmerge -
-    else
-        touch "$xauth"
-    fi
-    chmod a+r "$xauth"
-fi
+# xauth=/tmp/.docker.xauth
+# if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
+#     xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
+#     if [ ! -z "$xauth_list" ]; then
+#         echo "$xauth_list" | xauth -f "$xauth" nmerge -
+#     else
+#         touch "$xauth"
+#     fi
+#     chmod a+r "$xauth"
+# fi
 
 DOCKER_OPTS="${DOCKER_OPTS:-"-it"}"
 if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
@@ -46,12 +46,12 @@ if [ -z "$container_id" ]; then
         $DOCKER_OPTS \
         --env GZ_PARTITION=demo \
         --env DISPLAY \
-        --env XAUTHORITY="$xauth" \
+        --volume ${XAUTHORITY}:/home/docker/.Xauthority:rw \
         --env MODALITY_AUTH_TOKEN \
         --env MODALITY_RUN_ID \
         --env DEMO_HEADLESS \
-        --volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
-        --volume="$xauth:$xauth" \
+        --volume=/tmp/.X11-unix:/tmp/.X11-unix:rw \
+        --volume /dev/dri:/dev/dri \
         $container_image
 else
     docker exec --privileged -e DISPLAY -it $container_id bash

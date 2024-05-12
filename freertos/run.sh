@@ -2,16 +2,16 @@
 
 set -euo pipefail
 
-xauth=/tmp/.docker.xauth
-if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
-    xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
-    if [ ! -z "$xauth_list" ]; then
-        echo "$xauth_list" | xauth -f "$xauth" nmerge -
-    else
-        touch "$xauth"
-    fi
-    chmod a+r "$xauth"
-fi
+# xauth=/tmp/.docker.xauth
+# if [ ! -v DOCKER_WITHOUT_NVIDIA ] && [ ! -f "$xauth" ]; then
+#     xauth_list=$(sed -e 's/^..../ffff/' <<< "$(xauth nlist $DISPLAY)")
+#     if [ ! -z "$xauth_list" ]; then
+#         echo "$xauth_list" | xauth -f "$xauth" nmerge -
+#     else
+#         touch "$xauth"
+#     fi
+#     chmod a+r "$xauth"
+# fi
 
 DOCKER_OPTS="${DOCKER_OPTS:-"-it"}"
 if [ ! -v DOCKER_WITHOUT_NVIDIA ]; then
@@ -43,11 +43,12 @@ if [ -z "$container_id" ]; then
         --env DEMO_HEADLESS \
         --env GZ_PARTITION=demo \
         --env DISPLAY \
-        --env XAUTHORITY="$xauth" \
         --env MODALITY_AUTH_TOKEN \
         --volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
-        --volume="$xauth:$xauth" \
+        --volume="${XAUTHORITY}:/root/.Xauthority:rw" \
         --device /dev/net/tun:/dev/net/tun \
+        --privileged \
+        --cap-add=NET_ADMIN \
         $container_image
 else
     docker exec --privileged -e DISPLAY -it $container_id bash
