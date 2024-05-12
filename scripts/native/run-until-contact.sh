@@ -33,8 +33,7 @@ sleep 10
 kill -SIGINT $refl_pid
 wait $refl_pid
 
-# TODO
-#./scripts/stop.sh
+./scripts/native/stop.sh
 
 modality internal sync-indices
 
