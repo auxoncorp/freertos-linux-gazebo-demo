@@ -70,3 +70,8 @@ interaction-mode = 'ipc'
     channel = 'bump_detected'
     format-string = '%d'
     attribute-keys = ['status']
+
+    [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
+    channel = 'test_framework_nonce'
+    format-string = '%u'
+    attribute-keys = ['nonce']

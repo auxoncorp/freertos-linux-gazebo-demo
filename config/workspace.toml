@@ -2,6 +2,12 @@ timeline-filters = ["_.execution_context = 'demo'"]
 
 custom-interactions = [
 """
+   start_component @ robot_framework as tx
+     -> test_framework_nonce @ init as rx
+   AND tx.nonce = rx.nonce
+""",
+
+"""
    publish_message @ robot_chassis (_.topic = 'wheel_imu') as tx
      -> wheel_speed @ Sensor as rx
    AND tx.seqnum = rx.seqnum

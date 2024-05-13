@@ -5,6 +5,8 @@ $name?="STM32F4_Discovery"
 $bin?=@build/sensor-firmware
 $tap?="renode-tap0"
 
+include @renode/commands.py
+
 using sysbus
 mach create $name
 machine LoadPlatformDescription @platforms/boards/stm32f4_discovery-kit.repl
@@ -55,8 +57,14 @@ macro reset
     sysbus WriteDoubleWord 0x1FFF7A10 $id1
     sysbus WriteDoubleWord 0x1FFF7A14 $id2
     sysbus WriteDoubleWord 0x1FFF7A18 $id3
+
+    # zero the noinit variables
+    clear_modality_noint_vars
 """
 
 runMacro $reset
+
+# Call this to supply a startup nonce from the test framework
+write_startup_nonce $startup_nonce
 
 start

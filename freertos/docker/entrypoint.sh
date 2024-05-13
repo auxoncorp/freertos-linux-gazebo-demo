@@ -10,7 +10,8 @@ if [ -v DEMO_HEADLESS ]; then
     RENODE_OPTS="${RENODE_OPTS} --disable-xwt --port=${RENODE_TELNET_PORT}"
 fi
 
-cmd="renode ${RENODE_OPTS} /app/emulate.resc"
-$cmd
+nonce="${FREERTOS_STARTUP_NONCE:-0}"
+
+renode ${RENODE_OPTS} -e "\$startup_nonce=$nonce ; include @/app/emulate.resc"
 
 exit 0

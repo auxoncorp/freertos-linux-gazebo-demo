@@ -10,3 +10,10 @@
 /gazebo/imu_relay/build
 
 .runids
+
+modality-robot-framework/
+.env
+robot_framework/__pycache__
+log.html
+output.xml
+report.html

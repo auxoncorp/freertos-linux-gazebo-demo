@@ -12,4 +12,8 @@ do
     fi
 done
 
+killall -9 modality-refelctor || true
+killall -9 modality-trace-recorder-tcp-collector || true
+killall -9 modality-lttng-live-collector || true
+
 exit 0

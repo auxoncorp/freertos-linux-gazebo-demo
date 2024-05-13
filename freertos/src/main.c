@@ -8,6 +8,7 @@
 #include "wss.h"
 #include "voltage_monitor.h"
 #include "stats.h"
+#include "modality.h"
 
 #include "stm32f4xx_hal_conf.h"
 
@@ -24,6 +25,8 @@ int main(void)
 
     tr = xTraceEnable(TRC_START);
     configASSERT(tr == TRC_SUCCESS);
+
+    modality_trace_startup_nonce();
 
     logging_init();
     ip_init();
