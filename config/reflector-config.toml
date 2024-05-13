@@ -36,6 +36,7 @@ user-event-channel = true
 remote = "192.0.2.80:8888"
 connect-timeout = "60s"
 use-timeline-id-channel = true
+interaction-mode = 'fully-linearized'
 
     [[plugins.ingest.collectors.trace-recorder-tcp.metadata.user-event-fmt-arg-attr-keys]]
     channel = 'stats'

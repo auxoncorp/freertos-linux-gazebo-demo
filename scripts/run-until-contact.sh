@@ -7,7 +7,8 @@ function get_num_contacts {
     echo "$cnt"
 }
 
-export MODALITY_RUN_ID="${MODALITY_RUN_ID:-$(uuidgen)}"
+run_id=$(./scripts/get_test_run_id.sh)
+export MODALITY_RUN_ID="${MODALITY_RUN_ID:-${run_id}}"
 echo "MODALITY_RUN_ID = ${MODALITY_RUN_ID}"
 
 RUST_LOG=error modality-reflector run --config config/reflector-config.toml --collector lttng-live --collector trace-recorder-tcp &

@@ -8,3 +8,5 @@
 /linux/actuator/build
 
 /gazebo/imu_relay/build
+
+.runids
