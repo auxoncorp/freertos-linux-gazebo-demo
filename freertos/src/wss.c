@@ -39,7 +39,9 @@ void wss_init(void)
 
     WSS->CTRL |= (WSS_CTRL_INIT | WSS_CTRL_USING_SIMULATOR);
 
-    xTaskCreate(wss_task, SENSOR_NAME, SENSOR_STACK_SIZE, NULL, SENSOR_PRIO, NULL);
+    TaskHandle_t handle = NULL;
+    xTaskCreate(wss_task, SENSOR_NAME, SENSOR_STACK_SIZE, NULL, SENSOR_PRIO, &handle);
+    xTaskNotifyGive(handle);
 }
 
 static void wss_task(void* params)
@@ -52,10 +54,11 @@ static void wss_task(void* params)
     TickType_t next_wake;
     (void) params;
 
+    ulTaskNotifyTake(/*xClearCountOnExit*/ pdFALSE, 0);
     ch = xTraceRegisterString("wheel_speed");
     bump_det_ch = xTraceRegisterString("bump_detected");
     vTaskDelay(WSS_POLL_PERIOD_MS * 2);
-    next_wake = xTaskGetTickCount();
+
     while(1)
     {
         const BaseType_t was_delayed = xTaskDelayUntil(&next_wake, WSS_POLL_PERIOD_MS);

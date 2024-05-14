@@ -57,7 +57,7 @@ Start Reflector
     Start Process                   modality-reflector
     ...                                 run  --config  ${REFLECTOR_CONFIG}  --collector  lttng-live  --collector   trace-recorder-tcp
     ...                                 alias=reflector
-    Sleep                           2s
+    Run Process                     curl  --retry-max-time  30  --retry  10  --retry-connrefused  http://localhost:14188
 
 Start System
     ${startup_nonce}                On Start Component          sensor
@@ -84,6 +84,5 @@ Run Until Contact
     Start Reflector
     Start System
     Wait For Contact
-    Sleep                           10s
     Stop System
     Evaluate Specs
