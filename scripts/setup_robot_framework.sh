@@ -11,10 +11,11 @@ source .env/bin/activate
 
 pip install maturin
 pip install patchelf
-pip install robotframework==6.0.2
-pip install robotframework-retryfailed==0.2.0
-pip install psutil==5.9.3
-pip install pyyaml==6.0
+pip install robotframework
+pip install robotframework-retryfailed
+pip install psutil
+pip install pyyaml
+pip install appdirs ipykernel pandas plotly plotly-express nbformat
 
 (
     cd modality-robot-framework
