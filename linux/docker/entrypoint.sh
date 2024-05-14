@@ -2,6 +2,14 @@
 
 set -euo pipefail
 
+trap ctrl_c INT TERM
+
+stopped=0
+ctrl_c() {
+    echo "Shutting down"
+    stopped=1
+}
+
 lttng-relayd \
     --background \
     -o ${LTTNG_HOME}/lttng/lttng-traces \
@@ -13,8 +21,14 @@ lttng create linux --live --shm-path /lttng/shm
 lttng enable-event --userspace actuator:'*'
 lttng start
 
-actuator-app
+actuator-app &
+pid=$!
+while [ $stopped -eq 0 ]; do
+    sleep 1
+done
 
+kill -SIGTERM $pid
+wait $pid
 sleep 1
 
 lttng stop
