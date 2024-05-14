@@ -84,5 +84,6 @@ Run Until Contact
     Start Reflector
     Start System
     Wait For Contact
+    Sleep                           10s
     Stop System
     Evaluate Specs
