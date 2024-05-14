@@ -20,6 +20,9 @@
 static void voltage_monitor_task(void* params);
 static uint8_t rand8(void);
 
+/* NOTE: zero means not-set, the test framework must write a value here regardless of use */
+static __attribute__((section(".noinit"))) volatile uint32_t g_do_voltage_spike;
+
 void voltage_monitor_init(void)
 {
     xTaskCreate(voltage_monitor_task, VOLTAGE_MONITOR_NAME, VOLTAGE_MONITOR_STACK_SIZE, NULL, VOLTAGE_MONITOR_PRIO, NULL);
@@ -65,6 +68,14 @@ static void voltage_monitor_task(void* params)
         {
             millivolts = MV_MIN;
             mv_delta = rand8();
+        }
+
+        if(g_do_voltage_spike == 0)
+        {
+            if(millivolts >= MV_SPIKE)
+            {
+                millivolts = (MV_SPIKE - 1);
+            }
         }
     }
 }

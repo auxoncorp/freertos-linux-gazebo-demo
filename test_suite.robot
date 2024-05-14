@@ -62,6 +62,9 @@ Start Reflector
 Start System
     ${startup_nonce}                On Start Component          sensor
     Set Environment Variable        FREERTOS_STARTUP_NONCE      ${startup_nonce}
+    ${run_id}                       Get Environment Variable    MODALITY_RUN_ID
+    ${voltage_spike_enabled}        Evaluate                    ${run_id} % 2
+    Set Environment Variable        VOLTAGE_SPIKE_ENABLED       ${voltage_spike_enabled}
     Run Command                     ${START_SCRIPT}
 
 Stop System

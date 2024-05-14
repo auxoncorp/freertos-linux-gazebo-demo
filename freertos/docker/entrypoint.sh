@@ -19,8 +19,9 @@ if [ -v DEMO_HEADLESS ]; then
 fi
 
 nonce="${FREERTOS_STARTUP_NONCE:-0}"
+enable_voltage_spike="${VOLTAGE_SPIKE_ENABLED:-1}"
 
-renode ${RENODE_OPTS} -e "\$startup_nonce=$nonce ; include @/app/emulate.resc" &
+renode ${RENODE_OPTS} -e "\$startup_nonce=$nonce ; \$voltage_spike_enabled=$enable_voltage_spike ; include @/app/emulate.resc" &
 pid=$!
 while [ $stopped -eq 0 ]; do
     sleep 1

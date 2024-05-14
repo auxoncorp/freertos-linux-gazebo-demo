@@ -46,6 +46,7 @@ if [ -z "$container_id" ]; then
         --env XAUTHORITY="$xauth" \
         --env MODALITY_AUTH_TOKEN \
         --env FREERTOS_STARTUP_NONCE \
+        --env VOLTAGE_SPIKE_ENABLED \
         --volume=/tmp/.X11-unix:/tmp/.X11-unix:ro \
         --volume="$xauth:$xauth" \
         --device /dev/net/tun:/dev/net/tun \
