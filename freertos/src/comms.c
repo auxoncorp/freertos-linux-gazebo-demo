@@ -30,6 +30,7 @@ void comms_init(void)
 {
     g_comms_queue = xQueueCreate(COMMS_QUEUE_LENGTH, sizeof(comms_msg_s));
     configASSERT(g_comms_queue != NULL);
+    vTraceSetQueueName(g_comms_queue, "comms_queue");
 
     xTaskCreate(comms_task, COMMS_NAME, COMMS_STACK_SIZE, NULL, COMMS_PRIO, NULL);
 }

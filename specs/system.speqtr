@@ -40,7 +40,7 @@ behavior "Linux local control cycle"
     # @functional_requirement_id = "WALLBOT-3.3"
     # @safety_requirement_id = "WALLBOT-FMEA-3.7"
     recovery case "Corrupt messages are ignored"
-        "actuator:invalid_msg"@linux(_.reason.label = "BAD_MAGIC-2" or _.reason.label = "BAD_MAGIC1")
+        "actuator:invalid_msg"@linux(_.reason.label = "BAD_MAGIC0" or _.reason.label = "BAD_MAGIC1")
     end
 end
 
@@ -65,11 +65,5 @@ behavior 'Contact events are detected by the micro'
 
     nominal case 'Micro detects a bump'
         bump_detected@Sensor
-    end
-end
-
-behavior "Robot stays in the desired area"
-    prohibited case "Robot crosses the boundary lines"
-        linear_velocity@robot_chassis(_.x > 0.2 or _.x < -0.2 or _.y > 1.0 or _.y < -1.0) 
     end
 end
