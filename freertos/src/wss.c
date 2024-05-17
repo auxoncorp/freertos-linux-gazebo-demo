@@ -54,10 +54,11 @@ static void wss_task(void* params)
     TickType_t next_wake;
     (void) params;
 
+    next_wake = xTaskGetTickCount();
     ulTaskNotifyTake(/*xClearCountOnExit*/ pdFALSE, 0);
     ch = xTraceRegisterString("wheel_speed");
     bump_det_ch = xTraceRegisterString("bump_detected");
-    vTaskDelay(WSS_POLL_PERIOD_MS * 2);
+    xTaskDelayUntil(&next_wake, WSS_POLL_PERIOD_MS * 2);
 
     while(1)
     {

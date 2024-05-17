@@ -17,7 +17,7 @@ lttng-relayd \
     --control-port=tcp://0.0.0.0:5342 \
     --data-port=tcp://0.0.0.0:5343
 
-lttng create linux --live --shm-path /lttng/shm
+lttng create linux --live=100000 --shm-path /lttng/shm
 lttng enable-event --userspace actuator:'*'
 lttng start
 

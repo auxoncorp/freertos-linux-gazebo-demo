@@ -30,5 +30,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 ENV GZ_SIM_SYSTEM_PLUGIN_PATH=/home/docker/gazebo_plugins:${GZ_SIM_SYSTEM_PLUGIN_PATH}
 ENV GZ_SIM_RESOURCE_PATH=/home/docker/gazebo_worlds:${GZ_SIM_RESOURCE_PATH}
 
+COPY docker/shutdown_on_contact.sh /shutdown_on_contact.sh
+
 COPY docker/entrypoint.sh /
 CMD ["/entrypoint.sh"]

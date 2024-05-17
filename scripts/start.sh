@@ -10,6 +10,8 @@ export DOCKER_OPTS="-d=true"
     ./run.sh
 )
 
+./scripts/wait_for_freertos.sh
+
 (
     cd gazebo
     ./run.sh

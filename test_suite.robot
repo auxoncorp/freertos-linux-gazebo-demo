@@ -14,7 +14,8 @@ Test Teardown   Test System Test Teardown
 ${RUN_ID_SCRIPT}                ${CURDIR}/scripts/get_test_run_id.sh
 ${BUILD_SCRIPT}                 ${CURDIR}/scripts/build.sh
 ${START_SCRIPT}                 ${CURDIR}/scripts/start.sh
-${STOP_SCRIPT}                  ${CURDIR}/scripts/stop.sh
+${STOP_SCRIPT}                  ${CURDIR}/scripts/stop_docker.sh
+${KILLALL_SCRIPT}               ${CURDIR}/scripts/killall.sh
 ${REFLECTOR_CONFIG}             ${CURDIR}/config/reflector-config.toml
 
 *** Keywords ***
@@ -57,6 +58,8 @@ Start Reflector
     Start Process                   modality-reflector
     ...                                 run  --config  ${REFLECTOR_CONFIG}  --collector  lttng-live  --collector   trace-recorder-tcp
     ...                                 alias=reflector
+    ...                                 stdout=/tmp/reflector.stdout
+    ...                                 stderr=/tmp/reflector.stdout
     Run Process                     curl  --retry-max-time  30  --retry  10  --retry-connrefused  http://localhost:14188
 
 Start System
@@ -68,11 +71,12 @@ Start System
     Run Command                     ${START_SCRIPT}
 
 Stop System
-    Terminate Process               reflector
     Run Command                     ${STOP_SCRIPT}
+    Terminate Process               reflector
+    Run Command                     ${KILLALL_SCRIPT}
 
 Wait For Contact
-    Run Command                     modality wait-until "contact @ robot_chassis AGGREGATE count() > 0" --deadline "30s"
+    Run Command                     modality wait-until "contact@robot_chassis -> publish_message@robot_chassis AGGREGATE count() > 0" --deadline "30s"
 
 Evaluate Specs
     Run Command                     modality workspace sync-indices
@@ -87,6 +91,5 @@ Run Until Contact
     Start Reflector
     Start System
     Wait For Contact
-    Sleep                           10s
     Stop System
     Evaluate Specs

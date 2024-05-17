@@ -37,10 +37,11 @@ static void voltage_monitor_task(void* params)
     TickType_t next_wake;
     (void) params;
 
+    next_wake = xTaskGetTickCount();
     ch = xTraceRegisterString("voltage");
     spike_ch = xTraceRegisterString("voltage_spike");
-    vTaskDelay(UPDATE_PERIOD_MS * 2);
-    next_wake = xTaskGetTickCount();
+    xTaskDelayUntil(&next_wake, UPDATE_PERIOD_MS * 2);
+
     while(1)
     {
         const BaseType_t was_delayed = xTaskDelayUntil(&next_wake, UPDATE_PERIOD_MS);

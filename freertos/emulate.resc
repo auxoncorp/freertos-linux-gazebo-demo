@@ -38,9 +38,6 @@ connector Connect sysbus.ethernet switch
 emulation CreateTap $tap "tap"
 connector Connect host.tap switch
 
-# Virtual time ~= real time, default is 120
-cpu PerformanceInMips 1
-
 showAnalyzer sysbus.usart3
 
 # Set random board UNIQUE ID
